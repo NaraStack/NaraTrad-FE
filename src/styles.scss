@@ -13,7 +13,7 @@ html {
         primary: mat.$azure-palette,
         tertiary: mat.$blue-palette,
       ),
-      typography: Roboto,
+      typography: Outfit,
       density: 0,
     )
   );
@@ -48,7 +48,7 @@ html {
         primary: mat.$rose-palette,
         tertiary: mat.$red-palette,
       ),
-      typography: Roboto,
+      typography: Outfit,
       density: 0,
     )
   );
@@ -83,7 +83,7 @@ body {
 }
 body {
   margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  font-family: Outfit, 'Helvetica Neue', sans-serif;
 }
 
 html,
@@ -92,5 +92,5 @@ body {
 }
 body {
   margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  font-family: Outfit, 'Helvetica Neue', sans-serif;
 }
