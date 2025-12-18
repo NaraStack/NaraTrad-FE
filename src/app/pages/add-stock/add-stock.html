@@ -1,0 +1,46 @@
+<div class="add-stock-container">
+  <h1>Add Stock</h1>
+
+  <form [formGroup]="addStockForm" (ngSubmit)="onSubmit()" class="card-form">
+    <div class="form-group">
+      <label for="stock">Stock</label>
+      <select id="stock" formControlName="stockId">
+        <option value="">Choose Stock</option>
+        <option *ngFor="let stock of stocks" [value]="stock.id">
+          {{ stock.symbol }}
+        </option>
+      </select>
+      <div
+        class="error-msg"
+        *ngIf="addStockForm.get('stockId')?.touched && addStockForm.get('stockId')?.invalid"
+      >
+        Stock is required
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="price">Price</label>
+      <input id="price" type="number" formControlName="price" placeholder="$0.00" />
+    </div>
+
+    <div class="form-group">
+      <label for="quantity">Quantity</label>
+      <input
+        id="quantity"
+        type="text"
+        formControlName="quantity"
+        placeholder="Insert quantity (ex. 100)"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="totalPrice">Total Price</label>
+      <input id="totalPrice" type="number" formControlName="totalPrice" placeholder="$0.00" />
+    </div>
+
+    <div class="button-group">
+      <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn-add">Add</button>
+    </div>
+  </form>
+</div>
