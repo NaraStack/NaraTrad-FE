@@ -1,13 +1,30 @@
 .portfolio-container {
-  .mat-mdc-table,
-  .mat-mdc-header-row,
-  .mat-mdc-row,
-  .mat-mdc-header-cell,
-  .mat-mdc-cell {
+  .mat-mdc-table {
     background-color: transparent !important;
   }
+  .mat-mdc-header-row {
+    background-color: #0a0f6c;
+  }
+  .mat-mdc-row {
+    background-color: transparent !important;
+  }
+  .mat-mdc-header-cell {
+    background-color: #0a0f6c;
+    color: #ffffff !important;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 18px;
+    border-bottom: none;
+  }
+  .mat-mdc-cell {
+    background-color: transparent !important;
+    font-size: 18px;
+    font-weight: 500;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
   padding: 32px;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
 
 /* ===== Header ===== */
@@ -28,7 +45,6 @@
     color: #fff;
     border-radius: 24px;
     padding: 8px 20px;
-    font-weight: 600;
   }
 }
 
@@ -36,22 +52,32 @@
 .search-wrapper {
   display: flex;
   align-items: center;
-  width: 320px;
-  padding: 10px 14px;
-  border: 2px solid #dce6ff;
-  border-radius: 12px;
   margin-bottom: 32px;
 
   .search-icon {
-    color: #0a0f6c;
-    margin-right: 8px;
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-right: 12px;
   }
 
   .search-input {
-    border: none;
+    width: 320px;
+    padding: 10px 14px;
+    border: 2px solid #dce6ff;
+    border-radius: 12px;
     outline: none;
+    background: transparent;
+    box-shadow: none; 
     width: 100%;
     font-size: 16px;
+    color: #0a0f6c;
+
+    &::placeholder {
+      color: #0a0f6c;
+      font-size: 16px;
+    }
   }
 }
 
@@ -107,11 +133,36 @@ td.mat-cell {
 /* ===== Action ===== */
 .action-cell {
   display: flex;
-  gap: 12px;
+  gap: 4px;
   align-items: center;
 
   mat-icon {
     font-size: 26px;
     color: #0a0f6c;
   }
+
+  .icon-btn {
+    padding: 4px;
+  }
+
+  .action-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    cursor: pointer;
+  }
+}
+
+::ng-deep .mat-mdc-paginator {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  color: #0a0f6c;
+}
+
+::ng-deep .mat-mdc-paginator-range-label {
+  font-size:16px;
+}
+
+::ng-deep .mat-mdc-icon-button {
+  transform: scale(1.1);
 }
