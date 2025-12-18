@@ -1,12 +1,16 @@
 @use 'styles/colors' as *;
 
 .sidebar {
+  position: fixed;   
+  top: 0;           
+  left: 0;          
   width: 260px;
   height: 100dvh;
   background: linear-gradient(180deg, $blue, $blue-150);
   display: flex;
   flex-direction: column;
   color: $white;
+  z-index: 100;
 }
 
 .sidebar__header {
