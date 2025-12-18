@@ -7,13 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { RouterModule, Router } from '@angular/router';
 
 import { Stock } from '../../shared/models/stock';
 import { PortfolioService } from '../../features/portfolio/services/portfolio';
-
-import { RouterLink } from '@angular/router';
-import { Router } from '@angular/router';
+import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-portofolio',
@@ -26,20 +25,23 @@ import { Router } from '@angular/router';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatDialogModule,
     RouterModule,
-    RouterLink,
   ],
   templateUrl: './portofolio.html',
   styleUrl: './portofolio.scss',
 })
 export class Portofolio implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['symbol', 'price', 'change', 'quantity', 'action'];
-
   dataSource = new MatTableDataSource<Stock>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  constructor(private portfolioService: PortfolioService, private router: Router) {}
+  constructor(
+    private portfolioService: PortfolioService,
+    private router: Router,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.dataSource.filterPredicate = (data: Stock, filter: string) =>
@@ -48,7 +50,6 @@ export class Portofolio implements OnInit, AfterViewInit {
     this.portfolioService.getStocks().subscribe({
       next: (data) => {
         this.dataSource.data = data;
-        this.dataSource._updateChangeSubscription();
       },
       error: () => alert('Failed to load stocks'),
     });
@@ -61,22 +62,38 @@ export class Portofolio implements OnInit, AfterViewInit {
   applyFilter(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.dataSource.filter = value.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
+    this.dataSource.paginator?.firstPage();
   }
 
-  addStock(stock: Stock): void {
-    stock.quantity++;
-    this.dataSource.data = [...this.dataSource.data];
-  }
-
-  removeStock(stock: Stock): void {
-    this.dataSource.data = this.dataSource.data.filter((s) => s.id !== stock.id);
-  }
   goToAddStock(): void {
-    console.log('Button clicked');
     this.router.navigate(['/add-stock']);
+  }
+
+  confirmDelete(stock: Stock): void {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      width: '360px',
+      disableClose: true,
+      data: {
+        title: 'Delete Stock',
+        message: `Are you sure you want to delete ${stock.symbol}? This action cannot be undone.`,
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.deleteStock(stock);
+      }
+    });
+  }
+
+  private deleteStock(stock: Stock): void {
+    this.portfolioService.deleteStock(stock.id).subscribe({
+      next: () => {
+        this.dataSource.data = this.dataSource.data.filter(
+          (s) => s.id !== stock.id
+        );
+      },
+      error: () => alert('Failed to delete stock'),
+    });
   }
 }

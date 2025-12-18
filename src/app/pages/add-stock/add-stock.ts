@@ -3,9 +3,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-
-import { STOCK_MOCK } from '../../shared/mocks/stock.mock';
 import { Stock } from '../../shared/models/stock';
+import { PortfolioService } from '../../features/portfolio/services/portfolio';
 
 @Component({
   selector: 'app-add-stock',
@@ -16,15 +15,18 @@ import { Stock } from '../../shared/models/stock';
 })
 export class AddStockComponent implements OnInit, OnDestroy {
   addStockForm!: FormGroup;
-  stocks: Stock[] = STOCK_MOCK;
+  stocks: Stock[] = [];
 
   private destroy$ = new Subject<void>();
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private portfolioService: PortfolioService
+  ) {}
 
   ngOnInit(): void {
     this.addStockForm = this.fb.group({
-      stockId: [null, Validators.required],
+      symbol: ['', Validators.required],
       price: [{ value: 0, disabled: true }],
       quantity: [1, [Validators.required, Validators.min(1)]],
       totalPrice: [{ value: 0, disabled: true }],
@@ -32,14 +34,15 @@ export class AddStockComponent implements OnInit, OnDestroy {
 
     // Stock berubah → set price
     this.addStockForm
-      .get('stockId')
-      ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe((id: string) => {
-        const selectedStock = this.stocks.find(s => s.id === Number(id));
-        if (!selectedStock) return;
+      .get('symbol')
+      ?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(symbol => {
+        const stock = this.stocks.find(s => s.symbol === symbol);
+        if (!stock) return;
 
         this.addStockForm.patchValue(
-          { price: selectedStock.price },
+          { price: stock.price },
           { emitEvent: false }
         );
 
