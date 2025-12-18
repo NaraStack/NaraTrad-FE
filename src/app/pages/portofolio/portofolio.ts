@@ -42,8 +42,14 @@ export class Portofolio implements OnInit, AfterViewInit {
   constructor(private portfolioService: PortfolioService, private router: Router) {}
 
   ngOnInit(): void {
+    this.dataSource.filterPredicate = (data: Stock, filter: string) =>
+      data.symbol.toLowerCase().includes(filter);
+
     this.portfolioService.getStocks().subscribe({
-      next: (data) => (this.dataSource.data = data),
+      next: (data) => {
+        this.dataSource.data = data;
+        this.dataSource._updateChangeSubscription();
+      },
       error: () => alert('Failed to load stocks'),
     });
   }
@@ -55,6 +61,10 @@ export class Portofolio implements OnInit, AfterViewInit {
   applyFilter(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.dataSource.filter = value.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
   }
 
   addStock(stock: Stock): void {
