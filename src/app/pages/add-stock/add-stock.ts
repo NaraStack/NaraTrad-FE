@@ -34,22 +34,41 @@ export class AddStockComponent implements OnInit, OnDestroy {
     this.addStockForm
       .get('stockId')
       ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe((id: number) => {
-        const selectedStock = this.stocks.find((s) => s.id === id);
+      .subscribe((id: string) => {
+        const selectedStock = this.stocks.find(s => s.id === Number(id));
         if (!selectedStock) return;
 
-        this.addStockForm.patchValue({
-          price: selectedStock.price,
-        });
+        this.addStockForm.patchValue(
+          { price: selectedStock.price },
+          { emitEvent: false }
+        );
+
+        this.calculateTotal();
       });
 
     // Auto calculate total price
-    this.addStockForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      const price = this.addStockForm.get('price')?.value ?? 0;
-      const quantity = this.addStockForm.get('quantity')?.value ?? 0;
+    // this.addStockForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+    //   const price = this.addStockForm.get('price')?.value ?? 0;
+    //   const quantity = this.addStockForm.get('quantity')?.value ?? 0;
 
-      this.addStockForm.patchValue({ totalPrice: price * quantity }, { emitEvent: false });
-    });
+    //   this.addStockForm.patchValue({ totalPrice: price * quantity }, { emitEvent: false });
+    // });
+    this.addStockForm
+      .get('quantity')
+      ?.valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.calculateTotal();
+      });
+  }
+  
+  private calculateTotal(): void {
+    const price = this.addStockForm.get('price')?.value ?? 0;
+    const quantity = this.addStockForm.get('quantity')?.value ?? 0;
+
+    this.addStockForm.patchValue(
+      { totalPrice: price * quantity },
+      { emitEvent: false }
+    );
   }
 
   onSubmit(): void {

@@ -5,8 +5,8 @@
     <div class="form-group">
       <label for="stock">Stock</label>
       <select id="stock" formControlName="stockId">
-        <option value="">Choose Stock</option>
-        <option *ngFor="let stock of stocks" [value]="stock.id">
+        <option [ngValue]="null">Choose Stock</option>
+        <option *ngFor="let stock of stocks" [ngValue]="stock.id">
           {{ stock.symbol }}
         </option>
       </select>
@@ -20,7 +20,7 @@
 
     <div class="form-group">
       <label for="price">Price</label>
-      <input id="price" type="number" formControlName="price" placeholder="$0.00" />
+      <input id="price" type="number" formControlName="price" placeholder="$0.00" readonly/>
     </div>
 
     <div class="form-group">
@@ -35,7 +35,7 @@
 
     <div class="form-group">
       <label for="totalPrice">Total Price</label>
-      <input id="totalPrice" type="number" formControlName="totalPrice" placeholder="$0.00" />
+      <input id="totalPrice" type="number" formControlName="totalPrice" placeholder="$0.00" readonly/>
     </div>
 
     <div class="button-group">
