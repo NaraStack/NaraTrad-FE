@@ -9,6 +9,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RouterModule, Router } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
+import { MatSelectModule } from '@angular/material/select';
+
 
 import { Stock } from '../../shared/models/stock';
 import { PortfolioService } from '../../features/portfolio/services/portfolio';
@@ -26,6 +29,7 @@ import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-di
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    MatSelectModule,
     RouterModule,
   ],
   templateUrl: './dashboard.html',
@@ -34,13 +38,17 @@ import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-di
 export class Dashboard implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['symbol', 'price', 'change', 'quantity'];
   dataSource = new MatTableDataSource<Stock>();
+  totalPortfolioValue: number = 0;
+  totalStocksOwned: number = 0;
+
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private portfolioService: PortfolioService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -50,8 +58,22 @@ export class Dashboard implements OnInit, AfterViewInit {
     this.portfolioService.getStocks().subscribe({
       next: (data) => {
         this.dataSource.data = data;
+        setTimeout(() => {
+          this.dataSource.paginator = this.paginator;
+          this.cd.detectChanges(); 
+        });
       },
       error: () => alert('Failed to load stocks'),
+    });
+
+    // Ambil summary dari BE
+    this.portfolioService.getPortfolioSummary().subscribe({
+    next: (summary) => {
+      this.totalPortfolioValue = summary.totalPortfolioValue;
+      this.totalStocksOwned = summary.totalStocksOwned;
+      this.cd.detectChanges(); 
+    },
+    error: () => alert('Failed to load portfolio summary'),
     });
   }
 
@@ -67,13 +89,6 @@ export class Dashboard implements OnInit, AfterViewInit {
 
   goToAddStock(): void {
     this.router.navigate(['/add-stock']);
-  }
-
-  get totalPortfolioValue(): number {
-    return this.dataSource.data.reduce(
-      (total, stock) => total + stock.price * stock.quantity,
-      0
-    );
   }
 
   confirmDelete(stock: Stock): void {
