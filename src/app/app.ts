@@ -4,7 +4,13 @@ import { Sidebar } from './shared/components/sidebar/sidebar';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Sidebar],
+  standalone: true,
+  imports: [
+    RouterOutlet,
+    Sidebar,
+    // Jika Anda butuh CommonModule, FormsModule, dll di app.root:
+    // CommonModule
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
