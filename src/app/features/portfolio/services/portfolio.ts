@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Stock } from '../../../shared/models/stock'; 
 import { HttpParams } from '@angular/common/http';
@@ -24,5 +24,12 @@ export class PortfolioService {
   searchStocks(symbol: string): Observable<Stock[]> {
     const params = new HttpParams().set('query', symbol);
     return this.http.get<Stock[]>(`${this.apiUrl}/search`, { params });
+  }
+
+  getPortfolioSummary() {
+    return this.http.get<{
+      totalPortfolioValue: number;
+      totalStocksOwned: number;
+    }>(`${this.apiUrl}/summary`);
   }
 }

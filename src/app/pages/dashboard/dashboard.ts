@@ -16,7 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 
 import { Stock } from '../../shared/models/stock';
 import { PortfolioService } from '../../features/portfolio/services/portfolio';
@@ -34,8 +34,7 @@ import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-di
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    MatSelectModule,
-    RouterLink,  
+    MatSelectModule, 
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
