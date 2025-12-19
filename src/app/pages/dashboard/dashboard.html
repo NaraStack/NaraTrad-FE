@@ -6,7 +6,7 @@
 
   <div class="total-value-wrapper">
     <div class="total-value-title">Total Portfolio Value</div>
-    <div class="total-value">{{ totalPortfolioValue | currency:'USD':'symbol':'1.2-2' }}</div>
+    <div class="total-value">{{ totalPortfolioValue !== undefined ? (totalPortfolioValue | currency:'USD':'symbol':'1.2-2') : '$0.00' }}</div>
    </div>
 
   <!-- Table -->
