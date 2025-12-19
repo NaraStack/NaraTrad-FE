@@ -27,4 +27,14 @@ export class StockService {
       )
     );
   }
+
+  stockPrice(symbol: string): Observable<number> {
+    const url = `${this.API_URL}/price/${encodeURIComponent(symbol)}`;
+    return this.http.get<any>(url);
+  }
+
+  createStock(symbol: string, quantity: number): Observable<Stock> {
+    const url = `${this.API_URL}`;
+    return this.http.post<Stock>(url, { symbol, quantity });
+  }
 }
