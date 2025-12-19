@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Stock } from '../../../shared/models/stock'; 
 import { HttpParams } from '@angular/common/http';
@@ -12,7 +12,7 @@ export class PortfolioService {
 
   constructor(private http: HttpClient) {}
 
-
+  // GET semua saham (untuk tabel dashboard)
   getStocks(): Observable<Stock[]> {
     return this.http.get<Stock[]>(this.apiUrl);
   }
