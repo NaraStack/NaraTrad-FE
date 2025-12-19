@@ -41,47 +41,46 @@ export class AddStock implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // this.searchSubject
-    //   .pipe(
-    //     debounceTime(300),
-    //     distinctUntilChanged(),
-    //     tap((q) => console.log('Query lolos debounce:', q)), // Log untuk cek aliran data
-    //     takeUntil(this.destroy$),
-    //     switchMap((query) => {
-    //       if (!query.trim()) {
-    //         return of([]); // Gunakan of([]) agar tetap berupa Observable
-    //       }
-    //       this.loading = true;
-    //       console.log('Memanggil API untuk:', query);
-    //       // PENTING: catchError harus di dalam sini agar stream utama TIDAK MATI jika API error
-    //       return this.stockService.searchStocks(query).pipe(
-    //         catchError((err) => {
-    //           console.error('API Error:', err);
-    //           return of([]); // Jika error, kembalikan array kosong
-    //         }),
-    //         finalize(() => (this.loading = false))
-    //       );
-    //     })
-    //   )
-    //   .subscribe({
-    //     next: (stocks) => {
-    //       console.log('✅ Data dari API:', stocks);
-    //       this.stocks = stocks;
-    //     },
-    //     error: (err) => {
-    //       console.error('Kritis: Stream Utama Mati!', err);
-    //     },
-    //   });
-    this.stockService.searchStocks('f').subscribe({
-      next: (stocks) => {
-        console.log('Data ada di console:', stocks);
-        this.stocks = stocks;
-
-        // 3. Paksa Angular untuk me-render ulang UI
-        this.cdr.detectChanges();
-      },
-      error: (err) => console.error(err),
-    });
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap((q) => console.log('Query lolos debounce:', q)), // Log untuk cek aliran data
+        takeUntil(this.destroy$),
+        switchMap((query) => {
+          if (!query.trim()) {
+            return of([]); // Gunakan of([]) agar tetap berupa Observable
+          }
+          this.loading = true;
+          console.log('Memanggil API untuk:', query);
+          // PENTING: catchError harus di dalam sini agar stream utama TIDAK MATI jika API error
+          return this.stockService.searchStocks(query).pipe(
+            catchError((err) => {
+              console.error('API Error:', err);
+              return of([]); // Jika error, kembalikan array kosong
+            }),
+            finalize(() => (this.loading = false))
+          );
+        })
+      )
+      .subscribe({
+        next: (stocks) => {
+          console.log('✅ Data dari API:', stocks);
+          this.stocks = stocks;
+        },
+        error: (err) => {
+          console.error('Kritis: Stream Utama Mati!', err);
+        },
+      });
+    // this.stockService.searchStocks('f').subscribe({
+    //   next: (stocks) => {
+    //     console.log('Data ada di console:', stocks);
+    //     this.stocks = stocks;
+    //     // 3. Paksa Angular untuk me-render ulang UI
+    //     this.cdr.detectChanges();
+    //   },
+    //   error: (err) => console.error(err),
+    // });
   }
 
   // Method baru menggunakan ngModelChange
@@ -121,9 +120,9 @@ export class AddStock implements OnInit, OnDestroy {
     return `${stock.symbol}`;
   }
 
-  onStockSelected(): void {
-    if (this.selectedStockValue) {
-      const [symbol, name] = this.selectedStockValue.split('_');
+  onStockSelected(value: string): void {
+    if (value) {
+      const [symbol, name] = value.split('_');
       this.searchQuery = `${symbol} - ${name}`;
 
       // Simpan objek stock yang dipilih agar variabel selectedStock tidak error
