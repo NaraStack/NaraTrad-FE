@@ -62,4 +62,11 @@ export class PortfolioService {
       totalStocksOwned: number;
     }>(`${this.apiUrl}/summary`);
   }
+
+  getPortfolioSummary() {
+    return this.http.get<{
+      totalPortfolioValue: number;
+      totalStocksOwned: number;
+    }>(`${this.apiUrl}/summary`);
+  }
 }
