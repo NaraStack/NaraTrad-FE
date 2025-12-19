@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   Subject,
   debounceTime,
@@ -9,11 +9,10 @@ import {
   switchMap,
   finalize,
   of,
-  tap,
   catchError,
 } from 'rxjs';
 import { StockService } from '../../features/portfolio/services/stocks';
-import { ChangeDetectorRef } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 
 interface Stock {
   symbol: string;
@@ -23,40 +22,49 @@ interface Stock {
 @Component({
   selector: 'app-add-stock',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    // RouterModule
+  ],
   templateUrl: './add-stock.html',
+  styleUrl: './add-stock.scss',
 })
 export class AddStock implements OnInit, OnDestroy {
   searchQuery: string = '';
   stocks: Stock[] = [];
   selectedStockValue: string = '';
   loading: boolean = false;
-  selectedStock: Stock | null = null;
+  selectedStock: string | null = null;
+  stockPrice: string | null = null;
+  priceLoading: boolean = false;
+  totalPrice: string | null = null;
+  quantity: string = '';
+  // group!: FormGroup;
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
-  constructor(private stockService: StockService, private cdr: ChangeDetectorRef) {
-    console.log('--- AddStockComponent Terload ---');
-  }
+  constructor(
+    // private router: Router,
+    private stockService: StockService
+  ) {}
 
   ngOnInit(): void {
     this.searchSubject
       .pipe(
         debounceTime(300),
         distinctUntilChanged(),
-        tap((q) => console.log('Query lolos debounce:', q)), // Log untuk cek aliran data
         takeUntil(this.destroy$),
         switchMap((query) => {
           if (!query.trim()) {
             return of([]); // Gunakan of([]) agar tetap berupa Observable
           }
           this.loading = true;
-          console.log('Memanggil API untuk:', query);
           // PENTING: catchError harus di dalam sini agar stream utama TIDAK MATI jika API error
           return this.stockService.searchStocks(query).pipe(
             catchError((err) => {
-              console.error('API Error:', err);
               return of([]); // Jika error, kembalikan array kosong
             }),
             finalize(() => (this.loading = false))
@@ -65,27 +73,16 @@ export class AddStock implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (stocks) => {
-          console.log('✅ Data dari API:', stocks);
           this.stocks = stocks;
         },
         error: (err) => {
           console.error('Kritis: Stream Utama Mati!', err);
         },
       });
-    // this.stockService.searchStocks('f').subscribe({
-    //   next: (stocks) => {
-    //     console.log('Data ada di console:', stocks);
-    //     this.stocks = stocks;
-    //     // 3. Paksa Angular untuk me-render ulang UI
-    //     this.cdr.detectChanges();
-    //   },
-    //   error: (err) => console.error(err),
-    // });
   }
 
   // Method baru menggunakan ngModelChange
   onSearchChange(value: string): void {
-    console.log('Input Changes: ', value);
     this.searchQuery = value;
     if (value && value.length >= 1) {
       this.searchSubject.next(value);
@@ -113,7 +110,7 @@ export class AddStock implements OnInit, OnDestroy {
   }
 
   getStockValue(stock: Stock): string {
-    return `${stock.symbol}_${stock.name}`;
+    return `${stock.symbol}`;
   }
 
   getStockDisplay(stock: Stock): string {
@@ -122,15 +119,59 @@ export class AddStock implements OnInit, OnDestroy {
 
   onStockSelected(value: string): void {
     if (value) {
-      const [symbol, name] = value.split('_');
-      this.searchQuery = `${symbol} - ${name}`;
+      const symbol = value;
+      this.selectedStock = symbol;
 
-      // Simpan objek stock yang dipilih agar variabel selectedStock tidak error
-      this.selectedStock = { symbol, name };
-      this.stocks = [];
+      // 🔥 TAMBAHAN: fetch price dari API
+      this.priceLoading = true;
+      this.stockService
+        .stockPrice(symbol)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (price) => {
+            console.log('Fetched price: ', price);
+            this.stockPrice = price.toString();
+          },
+          error: () => {
+            this.stockPrice = null;
+          },
+          complete: () => {
+            this.priceLoading = false;
+          },
+        });
     } else {
       this.searchQuery = '';
       this.selectedStock = null;
+      this.stockPrice = null;
     }
+  }
+
+  calculateTotalPrice(): void {
+    const qty = Number(this.quantity);
+    const price = Number(this.stockPrice);
+    if (this.quantity && this.stockPrice) {
+      const total = qty * price;
+      this.totalPrice = total.toString();
+    }
+  }
+
+  onSubmit(): void {
+    if (!this.selectedStock || !this.quantity) return;
+
+    this.stockService
+      .createStock(this.selectedStock, Number(this.quantity))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          console.log('Stock added successfully!');
+          // ✅ redirect hanya setelah sukses
+          // this.router.navigate(['/portfolio'], {
+          //   state: { created: true },
+          // });
+        },
+        error: (err) => {
+          console.error('Failed to add stock!', err);
+        },
+      });
   }
 }
