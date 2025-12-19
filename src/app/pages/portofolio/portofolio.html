@@ -2,16 +2,13 @@
   <!-- Header -->
   <div class="header">
     <h1 class="title">Portfolio</h1>
-    <button mat-raised-button class="add-btn" routerLink="/add-stock">+ Add Stock</button>
+    <a mat-raised-button class="add-btn" routerLink="/add-stock">+ Add Stock</a>
+    <!-- <button mat-raised-button (click)="testClick()">TEST CLICK</button> -->
   </div>
 
   <!-- Search -->
   <div class="search-wrapper">
-    <img
-      src="/icon-search.png"
-      alt="Search"
-      class="search-icon"
-    />
+    <img src="/icon-search.png" alt="Search" class="search-icon" />
     <input
       matInput
       type="text"
@@ -71,9 +68,5 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </div>
-  <mat-paginator
-    [pageSize]="5"
-    [pageSizeOptions]="[5]"
-    showFirstLastButtons>
-  </mat-paginator>
+  <mat-paginator [pageSize]="5" [pageSizeOptions]="[5]" showFirstLastButtons> </mat-paginator>
 </div>
