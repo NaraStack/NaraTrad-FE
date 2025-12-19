@@ -1,46 +1,36 @@
-<div class="add-stock-container">
-  <h1>Add Stock</h1>
+<div class="stock-search-container">
+  <input
+    [ngModel]="searchQuery"
+    (ngModelChange)="onSearchChange($event)"
+    placeholder="Search stocks (e.g., AAPL, TSLA)..."
+    class="search-input"
+    autocomplete="off"
+  />
 
-  <form [formGroup]="addStockForm" (ngSubmit)="onSubmit()" class="card-form">
-    <div class="form-group">
-      <label for="stock">Stock</label>
-      <select id="stock" formControlName="stockId">
-        <option [ngValue]="null">Choose Stock</option>
-        <option *ngFor="let stock of stocks" [ngValue]="stock.id">
-          {{ stock.symbol }}
-        </option>
-      </select>
-      <div
-        class="error-msg"
-        *ngIf="addStockForm.get('stockId')?.touched && addStockForm.get('stockId')?.invalid"
-      >
-        Stock is required
+  <select [ngModel]="selectedStockValue" (ngModelChange)="onStockSelected()" class="stock-select">
+    <option value="">Select a stock...</option>
+    <option *ngFor="let stock of stocks" [value]="getStockValue(stock)">
+      {{ getStockDisplay(stock) }}
+    </option>
+  </select>
+
+  <!-- <div class="stock-lists" *ngFor="let stock of stocks">
+    <span>{{ stock.name }}</span>
+  </div> -->
+
+  <!-- <pre>{{ stocks | json }}</pre>
+  <p>Jumlah Stock: {{ stocks?.length }}</p>
+
+  <ul *ngIf="stocks.length > 0">
+    <li *ngFor="let stock of stocks; let i = index" class="stock-item">
+      <div class="stock-info">
+        <span class="stock-symbol">{{ stock.symbol }}</span>
+        <span class="stock-name">
+          {{ stock.name }}
+        </span>
       </div>
-    </div>
+    </li>
+  </ul> -->
 
-    <div class="form-group">
-      <label for="price">Price</label>
-      <input id="price" type="number" formControlName="price" placeholder="$0.00" readonly/>
-    </div>
-
-    <div class="form-group">
-      <label for="quantity">Quantity</label>
-      <input
-        id="quantity"
-        type="text"
-        formControlName="quantity"
-        placeholder="Insert quantity (ex. 100)"
-      />
-    </div>
-
-    <div class="form-group">
-      <label for="totalPrice">Total Price</label>
-      <input id="totalPrice" type="number" formControlName="totalPrice" placeholder="$0.00" readonly/>
-    </div>
-
-    <div class="button-group">
-      <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
-      <button type="submit" class="btn-add">Add</button>
-    </div>
-  </form>
+  <span *ngIf="loading">Searching...</span>
 </div>

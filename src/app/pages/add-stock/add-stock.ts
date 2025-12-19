@@ -1,110 +1,137 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { Stock } from '../../shared/models/stock';
-import { PortfolioService } from '../../features/portfolio/services/portfolio';
+import { FormsModule } from '@angular/forms';
+import {
+  Subject,
+  debounceTime,
+  distinctUntilChanged,
+  takeUntil,
+  switchMap,
+  finalize,
+  of,
+  tap,
+  catchError,
+} from 'rxjs';
+import { StockService } from '../../features/portfolio/services/stocks';
+import { ChangeDetectorRef } from '@angular/core';
+
+interface Stock {
+  symbol: string;
+  name: string;
+}
 
 @Component({
   selector: 'app-add-stock',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './add-stock.html',
-  styleUrls: ['./add-stock.scss'],
 })
-export class AddStockComponent implements OnInit, OnDestroy {
-  addStockForm!: FormGroup;
+export class AddStock implements OnInit, OnDestroy {
+  searchQuery: string = '';
   stocks: Stock[] = [];
+  selectedStockValue: string = '';
+  loading: boolean = false;
+  selectedStock: Stock | null = null;
 
+  private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private fb: FormBuilder,
-    private portfolioService: PortfolioService
-  ) {}
+  constructor(private stockService: StockService, private cdr: ChangeDetectorRef) {
+    console.log('--- AddStockComponent Terload ---');
+  }
 
   ngOnInit(): void {
-    this.addStockForm = this.fb.group({
-      symbol: ['', Validators.required],
-      price: [{ value: 0, disabled: true }],
-      quantity: [1, [Validators.required, Validators.min(1)]],
-      totalPrice: [{ value: 0, disabled: true }],
+    // this.searchSubject
+    //   .pipe(
+    //     debounceTime(300),
+    //     distinctUntilChanged(),
+    //     tap((q) => console.log('Query lolos debounce:', q)), // Log untuk cek aliran data
+    //     takeUntil(this.destroy$),
+    //     switchMap((query) => {
+    //       if (!query.trim()) {
+    //         return of([]); // Gunakan of([]) agar tetap berupa Observable
+    //       }
+    //       this.loading = true;
+    //       console.log('Memanggil API untuk:', query);
+    //       // PENTING: catchError harus di dalam sini agar stream utama TIDAK MATI jika API error
+    //       return this.stockService.searchStocks(query).pipe(
+    //         catchError((err) => {
+    //           console.error('API Error:', err);
+    //           return of([]); // Jika error, kembalikan array kosong
+    //         }),
+    //         finalize(() => (this.loading = false))
+    //       );
+    //     })
+    //   )
+    //   .subscribe({
+    //     next: (stocks) => {
+    //       console.log('✅ Data dari API:', stocks);
+    //       this.stocks = stocks;
+    //     },
+    //     error: (err) => {
+    //       console.error('Kritis: Stream Utama Mati!', err);
+    //     },
+    //   });
+    this.stockService.searchStocks('f').subscribe({
+      next: (stocks) => {
+        console.log('Data ada di console:', stocks);
+        this.stocks = stocks;
+
+        // 3. Paksa Angular untuk me-render ulang UI
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error(err),
     });
-
-    // Stock berubah → set price
-    this.addStockForm
-      .get('symbol')
-      ?.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(symbol => {
-        const stock = this.stocks.find(s => s.symbol === symbol);
-        if (!stock) return;
-
-        this.addStockForm.patchValue(
-          { price: stock.price },
-          { emitEvent: false }
-        );
-
-        this.calculateTotal();
-      });
-
-    // Auto calculate total price
-    // this.addStockForm.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
-    //   const price = this.addStockForm.get('price')?.value ?? 0;
-    //   const quantity = this.addStockForm.get('quantity')?.value ?? 0;
-
-    //   this.addStockForm.patchValue({ totalPrice: price * quantity }, { emitEvent: false });
-    // });
-    this.addStockForm
-      .get('quantity')
-      ?.valueChanges.pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.calculateTotal();
-      });
-  }
-  
-  private calculateTotal(): void {
-    const price = this.addStockForm.get('price')?.value ?? 0;
-    const quantity = this.addStockForm.get('quantity')?.value ?? 0;
-
-    this.addStockForm.patchValue(
-      { totalPrice: price * quantity },
-      { emitEvent: false }
-    );
   }
 
-  onSubmit(): void {
-    if (this.addStockForm.invalid) {
-      this.addStockForm.markAllAsTouched();
-      return;
+  // Method baru menggunakan ngModelChange
+  onSearchChange(value: string): void {
+    console.log('Input Changes: ', value);
+    this.searchQuery = value;
+    if (value && value.length >= 1) {
+      this.searchSubject.next(value);
+    } else {
+      this.stocks = [];
     }
-
-    const rawValue = this.addStockForm.getRawValue();
-    const stock = this.stocks.find((s) => s.id === rawValue.stockId);
-
-    const payload = {
-      stockId: rawValue.stockId,
-      symbol: stock?.symbol ?? '',
-      price: rawValue.price,
-      quantity: rawValue.quantity,
-      totalPrice: rawValue.totalPrice,
-    };
-
-    console.log('SUBMIT PAYLOAD:', payload);
-  }
-
-  onCancel(): void {
-    this.addStockForm.reset({
-      stockId: null,
-      price: 0,
-      quantity: 1,
-      totalPrice: 0,
-    });
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  onSearch(): void {
+    if (this.searchQuery.length >= 1) {
+      this.searchSubject.next(this.searchQuery);
+    } else {
+      this.stocks = [];
+    }
+  }
+
+  // Menambahkan method yang hilang sesuai error template
+  fetchSuggestions(): void {
+    this.onSearch();
+  }
+
+  getStockValue(stock: Stock): string {
+    return `${stock.symbol}_${stock.name}`;
+  }
+
+  getStockDisplay(stock: Stock): string {
+    return `${stock.symbol}`;
+  }
+
+  onStockSelected(): void {
+    if (this.selectedStockValue) {
+      const [symbol, name] = this.selectedStockValue.split('_');
+      this.searchQuery = `${symbol} - ${name}`;
+
+      // Simpan objek stock yang dipilih agar variabel selectedStock tidak error
+      this.selectedStock = { symbol, name };
+      this.stocks = [];
+    } else {
+      this.searchQuery = '';
+      this.selectedStock = null;
+    }
   }
 }
