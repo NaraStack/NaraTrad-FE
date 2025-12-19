@@ -46,7 +46,6 @@ export class Portofolio implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.dataSource.filterPredicate = (data: Stock, filter: string) =>
       data.symbol.toLowerCase().includes(filter);
-
     this.portfolioService.getStocks().subscribe({
       next: (data) => {
         this.dataSource.data = data;
@@ -89,9 +88,7 @@ export class Portofolio implements OnInit, AfterViewInit {
   private deleteStock(stock: Stock): void {
     this.portfolioService.deleteStock(stock.id).subscribe({
       next: () => {
-        this.dataSource.data = this.dataSource.data.filter(
-          (s) => s.id !== stock.id
-        );
+        this.dataSource.data = this.dataSource.data.filter((s) => s.id !== stock.id);
       },
       error: () => alert('Failed to delete stock'),
     });
