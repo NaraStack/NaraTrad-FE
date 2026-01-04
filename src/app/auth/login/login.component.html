@@ -1,0 +1,64 @@
+<div class="login-page">
+  <div class="login-card">
+    <div class="logo">
+      <div class="top">
+        <img src="logo.png" alt="NaraTrad" />
+        <h1>NaraTrad</h1>
+      </div>
+      <p>Stock Portfolio Tracker</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      <!-- Email -->
+      <label>Email Address</label>
+      <input type="email" formControlName="email" placeholder="Enter your email" />
+      <div class="error" *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid">
+        <span *ngIf="loginForm.get('email')?.errors?.['required']"> Email is required </span>
+        <span *ngIf="loginForm.get('email')?.errors?.['email']"> Enter a valid email </span>
+      </div>
+
+      <!-- Password -->
+      <label>Password</label>
+      <div class="password-group">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password"
+          placeholder="Enter your password"
+        />
+
+        <span class="eye material-icons" (click)="showPassword = !showPassword">
+          {{ showPassword ? 'visibility' : 'visibility_off' }}
+        </span>
+      </div>
+
+      <div
+        class="error"
+        *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+      >
+        <span *ngIf="loginForm.get('password')?.errors?.['required']"> Password is required </span>
+        <span *ngIf="loginForm.get('password')?.errors?.['minlength']">
+          Password must be at least 6 characters
+        </span>
+      </div>
+
+      <!-- Options -->
+      <div class="options">
+        <label class="remember">
+          <input type="checkbox" />
+          Remember me
+        </label>
+        <a routerLink="/forgot-password" class="forgot">Forgot Password?</a>
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit">Login</button>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+    </form>
+
+    <p class="register">
+      Don’t have an account?
+      <a routerLink="/register">Register</a>
+    </p>
+  </div>
+</div>
