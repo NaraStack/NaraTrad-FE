@@ -42,3 +42,56 @@ body {
   background-color: #fafafa;
   color: rgba(0, 0, 0, 0.87);
 }
+
+input,
+textarea,
+select {
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+}
+
+button {
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+}
+
+// Material button
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-flat-button,
+.mat-mdc-stroked-button,
+.mat-mdc-icon-button,
+.mat-mdc-fab,
+.mat-mdc-mini-fab {
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+}
+
+// Placeholder styles
+::placeholder {
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+  opacity: 1; // Firefox
+}
+
+::-webkit-input-placeholder {
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+}
+
+::-moz-placeholder {
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+}
+
+::-ms-input-placeholder {
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+}
+
+// Khusus untuk Material Form Field
+.mat-mdc-form-field {
+  font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+  
+  input::placeholder {
+    font-family: 'Outfit', 'Helvetica Neue', sans-serif;
+  }
+}
