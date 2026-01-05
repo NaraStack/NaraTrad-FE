@@ -97,13 +97,6 @@ export class AuthService {
   }
 
   /**
-   * Check if user is authenticated
-   */
-  isLoggedIn(): boolean {
-    return this.hasToken();
-  }
-
-  /**
    * Get token from storage
    */
   getToken(): string | null {
