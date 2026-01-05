@@ -1,0 +1,77 @@
+<div class="admin-dashboard">
+  <header class="dashboard-header">
+    <h1>Admin Dashboard</h1>
+    <button mat-raised-button color="warn" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      Logout
+    </button>
+  </header>
+
+  <div class="dashboard-content">
+    <mat-card class="welcome-card">
+      <mat-card-header>
+        <mat-card-title>Selamat Datang, Admin!</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        @if (currentUser) {
+        <div class="user-info">
+          <p><strong>Nama:</strong> {{ currentUser.fullName }}</p>
+          <p><strong>Email:</strong> {{ currentUser.email }}</p>
+          <p><strong>Role:</strong> {{ currentUser.role }}</p>
+        </div>
+        }
+        <p class="info-text">Ini adalah halaman dashboard admin yang masih dalam pengembangan.</p>
+        <p class="info-text">
+          Fitur-fitur admin seperti manajemen user, monitoring portfolio semua user, dan analytics
+          akan ditambahkan di sini.
+        </p>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="features-grid">
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon>people</mat-icon>
+          <mat-card-title>User Management</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Kelola semua user yang terdaftar di platform</p>
+          <button mat-button color="primary" disabled>Coming Soon</button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon>analytics</mat-icon>
+          <mat-card-title>Analytics</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Lihat statistik dan analytics platform</p>
+          <button mat-button color="primary" disabled>Coming Soon</button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon>assessment</mat-icon>
+          <mat-card-title>Reports</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Generate laporan portfolio semua user</p>
+          <button mat-button color="primary" disabled>Coming Soon</button>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="feature-card">
+        <mat-card-header>
+          <mat-icon>settings</mat-icon>
+          <mat-card-title>Settings</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Konfigurasi platform dan sistem</p>
+          <button mat-button color="primary" disabled>Coming Soon</button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
