@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../auth.service';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../core/services/auth.service';
+import { Role } from '../../core/models/auth.model';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +22,12 @@ export class LoginComponent {
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
-  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {}
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
 
   login() {
     if (this.loginForm.invalid) {
@@ -32,19 +38,26 @@ export class LoginComponent {
     this.loading = true;
     this.error = null;
 
-    // simulasi login
-    // setTimeout(() => {
-    //   const { email, password } = this.loginForm.value;
+    const { email, password } = this.loginForm.value;
 
-    //   if (email !== 'admin@test.com' || password !== 'password123') {
-    //     this.error = 'Email or password is incorrect';
-    //     this.loading = false;
-    //     return;
-    //   }
+    this.authService.login({ email: email!, password: password! }).subscribe({
+      next: (response) => {
+        this.loading = false;
 
-    //   this.authService.login('dummy-token');
-    //   this.loading = false;
-    //   this.router.navigate(['/dashboard']);
-    // }, 800);
+        // ambil returnUrl kalau ada
+        const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+
+        // redirect berdasarkan role
+        if (response.user.role === Role.ADMIN) {
+          this.router.navigateByUrl(returnUrl || '/admin/dashboard');
+        } else {
+          this.router.navigateByUrl(returnUrl || '/dashboard');
+        }
+      },
+      error: (err: string) => {
+        this.loading = false;
+        this.error = err;
+      },
+    });
   }
 }

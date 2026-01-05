@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-register',
@@ -11,36 +12,60 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent {
-  registerForm: FormGroup;
   showPassword = false;
-
   showConfirmPassword = false;
+  loading = false;
+  error: string | null = null;
 
-  constructor(private fb: FormBuilder) {
-    this.registerForm = this.fb.group(
-      {
-        fullName: ['', Validators.required],
-        email: ['', [Validators.required, Validators.email]],
-        password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', Validators.required],
-        rememberMe: [false],
-      },
-      { validators: this.passwordMatchValidator }
-    );
-  }
+  registerForm = this.fb.group(
+    {
+      fullName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: ['', Validators.required],
+    },
+    { validators: this.passwordMatchValidator }
+  );
 
-  passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirm = form.get('confirmPassword')?.value;
-    return password === confirm ? null : { mismatch: true };
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  passwordMatchValidator(form: any) {
+    return form.get('password')?.value === form.get('confirmPassword')?.value
+      ? null
+      : { mismatch: true };
   }
 
   onSubmit() {
-    if (this.registerForm.valid) {
-      console.log('Form Data:', this.registerForm.value);
-      // TODO: panggil API untuk register
-    } else {
+    if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
+      return;
     }
+
+    this.loading = true;
+    this.error = null;
+
+    const { fullName, email, password } = this.registerForm.value;
+
+    this.authService
+      .register({
+        fullName: fullName!,
+        email: email!,
+        password: password!,
+      })
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          // setelah register → login
+          this.router.navigate(['/login']);
+        },
+        error: (err: string) => {
+          this.loading = false;
+          this.error = err;
+        },
+      });
   }
 }
