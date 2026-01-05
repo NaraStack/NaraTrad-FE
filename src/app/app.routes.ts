@@ -1,28 +1,43 @@
 import { Routes } from '@angular/router';
+import { AdminDashboard } from './pages/admin/dashboard/admin-dashboard';
 import { Portofolio } from './pages/portofolio/portofolio';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { AddStock } from './pages/add-stock/add-stock';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
-import { AuthGuard } from './auth/auth.guard';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
+import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { Role } from './core/models/auth.model';
 
 export const routes: Routes = [
-  // LOGIN (TANPA SIDEBAR)
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent },
+  // AUTH (NO LAYOUT)
+  {
+    path: 'login',
+    component: LoginComponent,
+    canActivate: [guestGuard],
+  },
+  {
+    path: 'register',
+    component: RegisterComponent,
+    canActivate: [guestGuard],
+  },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
 
-  //  MAIN APP (PAKAI SIDEBAR)
+  // USER AREA
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     children: [
-      { path: 'dashboard', component: Dashboard },
+      {
+        path: 'dashboard',
+        component: Dashboard,
+        canActivate: [roleGuard([Role.USER])],
+      },
       { path: 'portfolio', component: Portofolio },
       { path: 'watchlist', component: Dashboard },
       { path: 'settings', component: Dashboard },
@@ -30,6 +45,19 @@ export const routes: Routes = [
     ],
   },
 
-  // 🚑 DEFAULT
+  // ADMIN AREA
+  {
+    path: 'admin',
+    component: MainLayoutComponent, 
+    canActivate: [authGuard, roleGuard([Role.ADMIN])],
+    children: [
+      {
+        path: 'dashboard',
+        component: AdminDashboard, 
+      },
+    ],
+  },
+
+  // DEFAULT
   { path: '**', redirectTo: 'login' },
 ];
