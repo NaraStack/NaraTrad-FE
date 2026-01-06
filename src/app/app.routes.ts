@@ -3,6 +3,8 @@ import { AdminDashboard } from './pages/admin/dashboard/admin-dashboard';
 import { Portofolio } from './pages/portofolio/portofolio';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { AddStock } from './pages/add-stock/add-stock';
+import { Watchlist } from './pages/watchlist/watchlist';
+import { Settings } from './pages/settings/settings';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
@@ -39,8 +41,8 @@ export const routes: Routes = [
         canActivate: [roleGuard([Role.USER])],
       },
       { path: 'portfolio', component: Portofolio },
-      { path: 'watchlist', component: Dashboard },
-      { path: 'settings', component: Dashboard },
+      { path: 'watchlist', component: Watchlist },
+      { path: 'settings', component: Settings },
       { path: 'add-stock', component: AddStock },
     ],
   },
