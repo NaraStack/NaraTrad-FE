@@ -1,51 +1,129 @@
 <div class="dashboard-container">
   <!-- Header -->
   <div class="header">
-    <h1 class="title">Dashboard</h1>
+    <h1 class="page-title">Dashboard</h1>
+    <div class="user-greeting">
+      <span>Welcome back,</span>
+      <span class="user-name">{{ userName }}</span>
+    </div>
   </div>
 
-  <div class="total-value-wrapper">
-    <div class="total-value-title">Total Portfolio Value</div>
-    <div class="total-value">{{ totalPortfolioValue !== undefined ? (totalPortfolioValue | currency:'USD':'symbol':'1.2-2') : '$0.00' }}</div>
-   </div>
-
-  <!-- Table -->
-  <div class="table-wrapper">
-    <table mat-table [dataSource]="dataSource">
-      <!-- Symbol -->
-      <ng-container matColumnDef="symbol">
-        <th mat-header-cell *matHeaderCellDef>Symbol</th>
-        <td mat-cell *matCellDef="let row">{{ row.symbol }}</td>
-      </ng-container>
-
-      <!-- Price -->
-      <ng-container matColumnDef="price">
-        <th mat-header-cell *matHeaderCellDef>Price</th>
-        <td mat-cell *matCellDef="let row">${{ row.price }}</td>
-      </ng-container>
-
-      <!-- Change -->
-      <ng-container matColumnDef="change">
-        <th mat-header-cell *matHeaderCellDef>Change</th>
-        <td mat-cell *matCellDef="let row" [ngClass]="row.change >= 0 ? 'positive' : 'negative'">
-          {{ row.change >= 0 ? '↑' : '↓' }}
-          {{ row.change }}%
-        </td>
-      </ng-container>
-
-      <!-- Quantity -->
-      <ng-container matColumnDef="quantity">
-        <th mat-header-cell *matHeaderCellDef>Quantity</th>
-        <td mat-cell *matCellDef="let row">{{ row.quantity }}</td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
+  <!-- Portfolio Value Card -->
+  <div class="portfolio-value-card">
+    <div class="portfolio-value-title">Total Portfolio Value</div>
+    <div class="portfolio-value-amount">{{ totalPortfolioValue | currency:'USD':'symbol':'1.2-2' }}</div>
+    <div class="daily-change" [ngClass]="totalGainLoss >= 0 ? 'positive' : 'negative'">
+      <span>{{ totalGainLoss >= 0 ? '▲' : '▼' }}</span>
+      <span>{{ totalGainLoss >= 0 ? '+' : '' }}{{ totalGainLoss | currency:'USD':'symbol':'1.2-2' }} ({{ totalGainLoss >= 0 ? '+' : '' }}{{ dailyChangePercent | number:'1.1-1' }}%) Today</span>
+    </div>
   </div>
-  <mat-paginator
-    [pageSize]="5"
-    [pageSizeOptions]="[5]"
-    showFirstLastButtons>
-  </mat-paginator>
+
+  <!-- Metrics Grid - First Row -->
+  <div class="metrics-grid-row">
+    <div class="metric-card large">
+      <div class="metric-label">Total Stocks Owned</div>
+      <div class="metric-value">{{ totalStocksOwned }}</div>
+    </div>
+  </div>
+
+  <!-- Metrics Grid - Second Row -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">Total Investment</div>
+      <div class="metric-value">{{ totalInvestment | currency:'USD':'symbol':'1.0-0' }}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Total Gain/Loss</div>
+      <div class="metric-value" [ngClass]="totalGainLoss >= 0 ? 'positive-value' : 'negative-value'">
+        {{ totalGainLoss >= 0 ? '+' : '' }}{{ totalGainLoss | currency:'USD':'symbol':'1.2-2' }}
+      </div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Return on Investment</div>
+      <div class="metric-value" [ngClass]="roi >= 0 ? 'positive-value' : 'negative-value'">
+        {{ roi >= 0 ? '+' : '' }}{{ roi | number:'1.1-1' }}%
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="chart-section">
+    <h2 class="section-title">Stock Performance Chart</h2>
+    <canvas #performanceChart height="80"></canvas>
+  </div>
+
+  <!-- Stock Lists Grid -->
+  <div class="stock-lists-grid">
+    <!-- Top Gainers -->
+    <div class="stock-list-card">
+      <h2 class="section-title">Top Gainers</h2>
+      <div *ngIf="topGainers.length > 0; else emptyGainers">
+        <div class="stock-item" *ngFor="let stock of topGainers">
+          <div class="stock-info">
+            <div class="stock-symbol">{{ stock.symbol }}</div>
+            <div class="stock-name">{{ stock.quantity }} shares</div>
+          </div>
+          <div class="stock-value">
+            <div class="stock-price">{{ stock.price | currency:'USD':'symbol':'1.2-2' }}</div>
+            <div class="stock-change positive">
+              <span>▲</span>
+              <span>+{{ stock.change | number:'1.1-1' }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #emptyGainers>
+        <div class="empty-state">
+          <div class="empty-state-text">No gainers today</div>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Top Losers -->
+    <div class="stock-list-card">
+      <h2 class="section-title">Top Losers</h2>
+      <div *ngIf="topLosers.length > 0; else emptyLosers">
+        <div class="stock-item" *ngFor="let stock of topLosers">
+          <div class="stock-info">
+            <div class="stock-symbol">{{ stock.symbol }}</div>
+            <div class="stock-name">{{ stock.quantity }} shares</div>
+          </div>
+          <div class="stock-value">
+            <div class="stock-price">{{ stock.price | currency:'USD':'symbol':'1.2-2' }}</div>
+            <div class="stock-change negative">
+              <span>▼</span>
+              <span>{{ stock.change | number:'1.1-1' }}%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #emptyLosers>
+        <div class="empty-state">
+          <div class="empty-state-text">No losers today</div>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Largest Holdings -->
+    <div class="stock-list-card">
+      <h2 class="section-title">Largest Holdings</h2>
+      <div *ngIf="largestHoldings.length > 0; else emptyHoldings">
+        <div class="stock-item" *ngFor="let stock of largestHoldings">
+          <div class="stock-info">
+            <div class="stock-symbol">{{ stock.symbol }}</div>
+            <div class="stock-name">{{ stock.quantity }} shares</div>
+          </div>
+          <div class="stock-value">
+            <div class="stock-price">{{ stock.totalValue | currency:'USD':'symbol':'1.2-2' }}</div>
+            <div class="stock-change" style="color: #666;">{{ stock.quantity }} shares</div>
+          </div>
+        </div>
+      </div>
+      <ng-template #emptyHoldings>
+        <div class="empty-state">
+          <div class="empty-state-text">No holdings yet</div>
+        </div>
+      </ng-template>
+    </div>
+  </div>
 </div>
