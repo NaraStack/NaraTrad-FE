@@ -122,3 +122,45 @@
     }
   }
 }
+
+.menu-logout-admin {
+  margin-top: 420px;
+  display: flex;
+  align-items: center;
+  padding: 16px 28px;
+  color: $white;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+  .label {
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  .icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 16px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+
+  &:hover {
+    background-color: $blue-100;
+    color: $blue;
+
+    .icon {
+      filter: none;
+    }
+  }
+
+  &.active {
+    background-color: $blue-50;
+    color: $blue;
+
+    .icon {
+      filter: none;
+    }
+  }
+}
