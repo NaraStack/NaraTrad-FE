@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Stock } from '../../../shared/models/stock';
+import { Stock, DashboardData } from '../../../shared/models/stock';
 import { HttpParams } from '@angular/common/http';
-import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PortfolioService {
-  private apiUrl = `${environment.apiUrl}/portfolio`;
+  private apiUrl = 'http://localhost:8080/api/portfolio';
 
   constructor(private http: HttpClient) {}
 
@@ -19,8 +18,8 @@ export class PortfolioService {
   }
 
   // GET dashboard lengkap (jika ingin data lebih lengkap)
-  getDashboard(): Observable<Stock[]> {
-    return this.http.get<Stock[]>(`${this.apiUrl}/dashboard`);
+  getDashboard(): Observable<DashboardData> {
+    return this.http.get<DashboardData>(`${this.apiUrl}/dashboard`);
   }
 
   // DELETE stock by id
