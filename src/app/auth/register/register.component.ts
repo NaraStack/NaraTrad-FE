@@ -3,11 +3,13 @@ import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ToastComponent } from 'app/shared/components/toast/toast.component';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatSnackBarModule, ToastComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
@@ -30,7 +32,8 @@ export class RegisterComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {}
 
   passwordMatchValidator(form: any) {
@@ -59,12 +62,40 @@ export class RegisterComponent {
       .subscribe({
         next: () => {
           this.loading = false;
-          // setelah register → login
+
+          // TOAST SUCCESS
+          this.snackBar.openFromComponent(ToastComponent, {
+            data: {
+              type: 'success',
+              title: 'Account created!',
+              message: 'Please login.',
+            },
+            duration: 4000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['toast-panel'],
+          });
+
+          // redirect ke login
           this.router.navigate(['/login']);
         },
-        error: (err: string) => {
+
+        error: (err: any) => {
           this.loading = false;
           this.error = err;
+
+          // TOAST ERROR
+          this.snackBar.openFromComponent(ToastComponent, {
+            data: {
+              type: 'error',
+              title: 'Email already exists!',
+              message: 'Try logging in instead.',
+            },
+            duration: 4000,
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            panelClass: ['toast-panel'],
+          });
         },
       });
   }
