@@ -16,6 +16,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { AuthService } from '../../core/services/auth.service';
+
 
 import { Router } from '@angular/router';
 
@@ -65,12 +67,18 @@ export class Dashboard implements OnInit, AfterViewInit {
   constructor(
     private portfolioService: PortfolioService,
     private router: Router,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.loadDashboard();
-  }
+  this.loadDashboard();
+
+  this.authService.currentUser$.subscribe(user => {
+    this.userName = user?.fullName ?? 'User';
+  });
+}
+
 
   ngAfterViewInit(): void {
     // Chart will be initialized after data is loaded
