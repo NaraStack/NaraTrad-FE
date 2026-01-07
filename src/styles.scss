@@ -90,8 +90,22 @@ button {
 // Khusus untuk Material Form Field
 .mat-mdc-form-field {
   font-family: 'Outfit', 'Helvetica Neue', sans-serif;
-  
+
   input::placeholder {
     font-family: 'Outfit', 'Helvetica Neue', sans-serif;
   }
+}
+
+// untuk hilangan style bawaan snackbar
+.toast-panel.mat-mdc-snack-bar-container {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+
+.toast-panel .mdc-snackbar__surface {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
