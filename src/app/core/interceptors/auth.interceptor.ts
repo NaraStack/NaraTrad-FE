@@ -4,9 +4,13 @@ import { AuthService } from '../services/auth.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
+
+  if (req.url.includes('/auth/login') || req.url.includes('/auth/register')) {
+    return next(req);
+  }
+
   const token = authService.getToken();
 
-  // Clone the request and add the authorization header if token exists
   if (token) {
     req = req.clone({
       setHeaders: {
