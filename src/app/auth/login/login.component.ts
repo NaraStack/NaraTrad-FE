@@ -4,11 +4,13 @@ import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
 import { Role } from '../../core/models/auth.model';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ToastComponent } from 'app/shared/components/toast/toast.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatSnackBarModule, ToastComponent],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
@@ -26,7 +28,8 @@ export class LoginComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private snackBar: MatSnackBar
   ) {}
 
   login() {
@@ -44,19 +47,47 @@ export class LoginComponent {
       next: (response) => {
         this.loading = false;
 
+        // TOAST SUCCESS
+        this.snackBar.openFromComponent(ToastComponent, {
+          data: {
+            type: 'success',
+            title: 'Login successful!',
+            message: 'Redirecting to dashboard...',
+          },
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+          panelClass: ['toast-panel'],
+        });
+
         // ambil returnUrl kalau ada
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
 
         // redirect berdasarkan role
-        if (response.user.role === Role.ADMIN) {
-          this.router.navigateByUrl(returnUrl || '/admin/dashboard');
-        } else {
-          this.router.navigateByUrl(returnUrl || '/dashboard');
-        }
+        setTimeout(() => {
+          if (response.user.role === Role.ADMIN) {
+            this.router.navigateByUrl(returnUrl || '/admin/dashboard');
+          } else {
+            this.router.navigateByUrl(returnUrl || '/dashboard');
+          }
+        }, 500);
       },
-      error: (err: string) => {
+
+      error: (err: any) => {
         this.loading = false;
-        this.error = err;
+
+        // TOAST ERROR
+        this.snackBar.openFromComponent(ToastComponent, {
+          data: {
+            type: 'error',
+            title: 'Invalid email or password!',
+            message: 'Please check your credentials and try again.',
+          },
+          duration: 4000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+          panelClass: ['toast-panel'],
+        });
       },
     });
   }
