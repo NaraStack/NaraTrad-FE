@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Stock } from '../../../shared/models/stock';
+import { Stock, DashboardData, PerformanceChartDTO } from '../../../shared/models/stock';
 import { HttpParams } from '@angular/common/http';
 
 @Injectable({
@@ -18,8 +18,8 @@ export class PortfolioService {
   }
 
   // GET dashboard lengkap (jika ingin data lebih lengkap)
-  getDashboard(): Observable<Stock[]> {
-    return this.http.get<Stock[]>(`${this.apiUrl}/dashboard`);
+  getDashboard(): Observable<DashboardData> {
+    return this.http.get<DashboardData>(`${this.apiUrl}/dashboard`);
   }
 
   // DELETE stock by id
@@ -54,5 +54,10 @@ export class PortfolioService {
     return this.http.get<{ totalPortfolioValue: number; totalStocksOwned: number }>(
       `${this.apiUrl}/summary`
     );
+  }
+
+  // GET performance chart data
+  getPerformanceChart(): Observable<PerformanceChartDTO> {
+    return this.http.get<PerformanceChartDTO>(`${this.apiUrl}/performance`);
   }
 }
