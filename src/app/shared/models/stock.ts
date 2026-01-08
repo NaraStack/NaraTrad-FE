@@ -29,7 +29,14 @@ export interface DashboardData {
   totalInvestment: number; // Total invested capital
   totalGainLoss: number; // Total gain/loss in USD
   roi: number; // Return on Investment in percent
+  dailyChange: number; // Today's change in USD
+  dailyChangePercent: number; // Today's change in percent
 
   // Detail per stock
   stockList: Stock[]; // Detail data for each stock
+}
+
+export interface PerformanceChartDTO {
+  labels: string[]; // Date labels for chart (e.g., ["Jan 01", "Jan 02", ...])
+  values: number[]; // Portfolio values for each date
 }
