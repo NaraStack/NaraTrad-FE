@@ -1,0 +1,13 @@
+<div class="toast" [ngClass]="data.type">
+  <div class="icon">
+    <span *ngIf="data.type === 'success'">✔</span>
+    <span *ngIf="data.type === 'error'">✕</span>
+  </div>
+
+  <div class="content">
+    <div class="title">{{ data.title }}</div>
+    <div class="message">{{ data.message }}</div>
+  </div>
+
+  <button class="close" (click)="close()">✕</button>
+</div>

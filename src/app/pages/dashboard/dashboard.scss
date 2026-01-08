@@ -1,32 +1,9 @@
 .dashboard-container {
-  .mat-mdc-table {
-    background-color: transparent !important;
-  }
-  .mat-mdc-header-row {
-    background-color: #0a0f6c;
-  }
-  .mat-mdc-row {
-    background-color: transparent !important;
-  }
-  .mat-mdc-header-cell {
-    background-color: #0a0f6c;
-    color: #ffffff !important;
-    font-size: 18px;
-    font-weight: 600;
-    padding: 18px;
-    border-bottom: none;
-  }
-  .mat-mdc-cell {
-    background-color: transparent !important;
-    font-size: 18px;
-    font-weight: 500;
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
   margin-left: 260px;
-  padding: 32px;
+  padding: 32px 40px;
   font-family: 'Outfit', sans-serif;
-  background-color: #ffffff;
+  background: #f5f7fa;
+  min-height: 100vh;
 }
 
 /* ===== Header ===== */
@@ -34,137 +11,286 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 32px;
+
+  .page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #000851;
+  }
+
+  .user-greeting {
+    font-size: 1.1rem;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .user-name {
+      font-weight: 600;
+      color: #000851;
+    }
+  }
+}
+
+/* ===== Portfolio Value Card ===== */
+.portfolio-value-card {
+  background: white;
+  border: 3px solid #000851;
+  border-radius: 20px;
+  padding: 32px;
+  margin-bottom: 32px;
+  box-shadow: 0 4px 12px rgba(0, 8, 81, 0.08);
+
+  .portfolio-value-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #000851;
+    margin-bottom: 12px;
+  }
+
+  .portfolio-value-amount {
+    font-size: 3.5rem;
+    font-weight: 700;
+    color: #2d6a4f;
+    margin-bottom: 16px;
+  }
+
+  .daily-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1.1rem;
+
+    &.positive {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    &.negative {
+      background: #f8d7da;
+      color: #721c24;
+    }
+  }
+}
+
+/* ===== Metrics Grid First Row ===== */
+.metrics-grid-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
   margin-bottom: 24px;
 
-  .title {
-    font-size: 32px;
-    font-weight: 700;
-    color: #0a0f6c;
-  }
-
-  .add-btn {
-    background-color: #2f5d2f;
-    color: #fff;
-    border-radius: 24px;
-    padding: 8px 20px;
+  .metric-card.large {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #000851;
   }
 }
 
-/* ===== Total Value ===== */
-.total-value-wrapper {
-    display: flex;
-    width: 80%;
-    padding: 40px;
+/* ===== Metrics Grid Second Row ===== */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+
+  .metric-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #000851;
+  }
+
+  .metric-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+
+  .metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #000851;
+
+    &.positive-value {
+      color: #2d6a4f;
+    }
+
+    &.negative-value {
+      color: #8b3a3a;
+    }
+  }
+}
+
+/* ===== Chart Section ===== */
+.chart-section {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #000851;
+    margin-bottom: 20px;
+  }
+}
+
+/* ===== Stock Lists Grid ===== */
+.stock-lists-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
+
+  .stock-list-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    .section-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #000851;
+      margin-bottom: 20px;
+    }
+
+    .stock-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #f8f9fa;
+      }
+
+      .stock-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .stock-symbol {
+          font-weight: 700;
+          font-size: 1.1rem;
+          color: #000851;
+        }
+
+        .stock-name {
+          font-size: 0.85rem;
+          color: #666;
+        }
+      }
+
+      .stock-value {
+        text-align: right;
+
+        .stock-price {
+          font-weight: 600;
+          font-size: 1.1rem;
+          color: #333;
+        }
+
+        .stock-change {
+          font-size: 0.9rem;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          justify-content: flex-end;
+
+          &.positive {
+            color: #155724;
+          }
+
+          &.negative {
+            color: #721c24;
+          }
+        }
+      }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #999;
+
+      .empty-state-text {
+        font-size: 0.95rem;
+      }
+    }
+  }
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 1400px) {
+  .stock-lists-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-container {
+    margin-left: 200px;
+  }
+
+  .stock-lists-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .header {
     flex-direction: column;
-    gap: 16px;
-    border-radius: 32px;
-    border: 4px solid #000072;
-    background: #FFF;
-    margin-bottom: 40px;
-}
+    align-items: flex-start;
+    gap: 12px;
 
-.total-value-title {
-    color: #000072;
-    font-feature-settings: 'liga' off, 'clig' off;
-    font-family: Outfit;
-    font-size: 28px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 20px; /* 71.429% */
-}
+    .page-title {
+      font-size: 2rem;
+    }
 
-.total-value {
-    color: #1B602F;
-    font-feature-settings: 'liga' off, 'clig' off;
-    font-family: Outfit;
-    font-size: 36px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 40px;
-}
-
-/* ===== Table Wrapper ===== */
-.table-wrapper {
-  border-radius: 20px;
-  overflow: hidden;
-  border: 3px solid #0a0f6c;
-}
-
-/* ===== Table ===== */
-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-/* ===== Header ===== */
-th.mat-header-cell {
-  background-color: #0a0f6c;
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-  padding: 18px;
-}
-
-tr.mat-row {
-  border-bottom: 2px solid #0a0f6c;
-}
-
-tr.mat-row:last-child {
-  border-bottom: none;
-}
-
-/* ===== Cell ===== */
-td.mat-cell {
-  font-size: 18px;
-  font-weight: 600;
-  color: #0a0f6c;
-  padding: 16px;
-  border-bottom: none; // 🔥 HAPUS border td
-}
-
-/* ===== Change color ===== */
-.positive {
-  color: #4a7c59;
-}
-
-.negative {
-  color: #8b3a3a;
-}
-
-/* ===== Action ===== */
-.action-cell {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-
-  mat-icon {
-    font-size: 26px;
-    color: #0a0f6c;
+    .user-greeting {
+      font-size: 1rem;
+    }
   }
 
-  .icon-btn {
-    padding: 4px;
+  .portfolio-value-card {
+    padding: 24px;
+
+    .portfolio-value-amount {
+      font-size: 2.5rem;
+    }
   }
 
-  .action-icon {
-    width: 24px;
-    height: 24px;
-    object-fit: contain;
-    cursor: pointer;
+  .metrics-grid-row,
+  .metrics-grid {
+    grid-template-columns: 1fr;
   }
-}
 
-::ng-deep .mat-mdc-paginator {
-  font-family: 'Outfit', sans-serif;
-  font-size: 16px;
-  color: #0a0f6c;
-}
-
-::ng-deep .mat-mdc-paginator-range-label {
-  font-size:16px;
-}
-
-::ng-deep .mat-mdc-icon-button {
-  transform: scale(1.1);
+  .stock-lists-grid {
+    grid-template-columns: 1fr;
+  }
 }
