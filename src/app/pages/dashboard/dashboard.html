@@ -12,9 +12,9 @@
   <div class="portfolio-value-card">
     <div class="portfolio-value-title">Total Portfolio Value</div>
     <div class="portfolio-value-amount">{{ totalPortfolioValue | currency:'USD':'symbol':'1.2-2' }}</div>
-    <div class="daily-change" [ngClass]="totalGainLoss >= 0 ? 'positive' : 'negative'">
-      <span>{{ totalGainLoss >= 0 ? '▲' : '▼' }}</span>
-      <span>{{ totalGainLoss >= 0 ? '+' : '' }}{{ totalGainLoss | currency:'USD':'symbol':'1.2-2' }} ({{ totalGainLoss >= 0 ? '+' : '' }}{{ dailyChangePercent | number:'1.1-1' }}%) Today</span>
+    <div class="daily-change" [ngClass]="dailyChange >= 0 ? 'positive' : 'negative'">
+      <span>{{ dailyChange >= 0 ? '▲' : '▼' }}</span>
+      <span>{{ dailyChange >= 0 ? '+' : '' }}{{ dailyChange | currency:'USD':'symbol':'1.2-2' }} ({{ dailyChange >= 0 ? '+' : '' }}{{ dailyChangePercent | number:'1.1-1' }}%) Today</span>
     </div>
   </div>
 

@@ -52,6 +52,7 @@ export class Dashboard implements OnInit, AfterViewInit {
   totalInvestment = 0;
   totalGainLoss = 0;
   roi = 0;
+  dailyChange = 0;
   dailyChangePercent = 0;
 
   // Stock Lists
@@ -95,18 +96,15 @@ export class Dashboard implements OnInit, AfterViewInit {
         this.totalInvestment = data.totalInvestment || 0;
         this.totalGainLoss = data.totalGainLoss || 0;
         this.roi = data.roi || 0;
-
-        // Calculate daily change percent
-        if (this.totalPortfolioValue > 0 && this.totalGainLoss > 0) {
-          this.dailyChangePercent = (this.totalGainLoss / this.totalInvestment) * 100;
-        }
+        this.dailyChange = data.dailyChange || 0;
+        this.dailyChangePercent = data.dailyChangePercent || 0;
 
         // Process stock lists
         this.processStockLists(data.stockList || []);
 
         // Initialize chart
         this.cd.detectChanges();
-        this.initializeChart();
+        this.loadPerformanceChart();
       },
       error: (err) => {
         console.error('Failed to load dashboard data', err);
@@ -133,7 +131,18 @@ export class Dashboard implements OnInit, AfterViewInit {
       .slice(0, 3);
   }
 
-  private initializeChart(): void {
+  private loadPerformanceChart(): void {
+    this.portfolioService.getPerformanceChart().subscribe({
+      next: (data) => {
+        this.initializeChart(data.labels, data.values);
+      },
+      error: (err) => {
+        console.error('Failed to load chart data', err);
+      }
+    });
+  }
+
+  private initializeChart(labels: string[], dataPoints: number[]): void {
     if (!this.performanceChartRef) return;
 
     const ctx = this.performanceChartRef.nativeElement.getContext('2d');
@@ -142,23 +151,6 @@ export class Dashboard implements OnInit, AfterViewInit {
     // Destroy existing chart if any
     if (this.chart) {
       this.chart.destroy();
-    }
-
-    // Generate mock data for 7 days (can be replaced with real data later)
-    const today = new Date();
-    const labels: string[] = [];
-    const dataPoints: number[] = [];
-
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-
-      // Generate mock data with gradual increase
-      const baseValue = this.totalInvestment;
-      const progress = (6 - i) / 6;
-      const value = baseValue + (this.totalGainLoss * progress);
-      dataPoints.push(Math.round(value * 100) / 100);
     }
 
     // Create gradient
