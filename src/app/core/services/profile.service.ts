@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, tap, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { UserResponse } from '../models/auth.model';
 import { AuthService } from './auth.service';
@@ -68,9 +68,27 @@ export class ProfileService {
    */
   changePassword(request: ChangePasswordRequest): Observable<{ message: string }> {
     return this.http
-      .put<{ message: string }>(`${this.apiUrl}/password`, request)
+      .put<{ message: string }>(`${this.apiUrl}/password`, request, {
+        observe: 'response',
+      })
       .pipe(
+        tap((response) => {
+          console.log('Password change full response:', response);
+          console.log('Status:', response.status);
+          console.log('Body:', response.body);
+        }),
+        map((response) => {
+          // Handle various possible response formats
+          if (response.body) {
+            return response.body;
+          }
+          // Fallback if body is empty but status is 200
+          return { message: 'Password changed successfully' };
+        }),
         catchError((error: HttpErrorResponse) => {
+          console.error('Password change error:', error);
+          console.error('Error status:', error.status);
+          console.error('Error body:', error.error);
           return throwError(() => this.handleError(error));
         })
       );
