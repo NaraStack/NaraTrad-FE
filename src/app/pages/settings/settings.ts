@@ -110,7 +110,12 @@ export class Settings implements OnInit {
         next: () => {
           this.passwordLoading = false;
           this.passwordForm.reset();
-          this.showToast('success', 'Success!', 'Password berhasil diubah');
+          this.showToast('success', 'Success!', 'Password berhasil diubah. Silakan login kembali.');
+
+          // Auto-logout after 2 seconds to allow user to see success message
+          setTimeout(() => {
+            this.authService.logout();
+          }, 2000);
         },
         error: (err) => {
           this.passwordLoading = false;
