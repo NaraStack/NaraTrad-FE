@@ -50,12 +50,16 @@ export const routes: Routes = [
   // ADMIN AREA
   {
     path: 'admin',
-    component: MainLayoutComponent, 
+    component: MainLayoutComponent,
     canActivate: [authGuard, roleGuard([Role.ADMIN])],
     children: [
       {
         path: 'dashboard',
-        component: AdminDashboard, 
+        component: AdminDashboard,
+      },
+      {
+        path: 'settings',
+        component: Settings,
       },
     ],
   },
