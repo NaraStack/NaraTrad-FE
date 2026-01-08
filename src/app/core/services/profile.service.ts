@@ -95,15 +95,25 @@ export class ProfileService {
   }
 
   private handleError(error: HttpErrorResponse): string {
+    // Priority 1: Check for 'message' field in error.error (backend error message)
+    if (error.error?.message) {
+      return error.error.message;
+    }
+
+    // Priority 2: Check for 'error' field in error.error
     if (error.error?.error) {
       return error.error.error;
     }
 
-    if (error.error && typeof error.error === 'object' && !error.error.error) {
-      const errorMessages = Object.values(error.error);
-      return errorMessages.join(', ');
+    // Priority 3: Handle validation errors (object with multiple fields)
+    if (error.error && typeof error.error === 'object' && !error.error.error && !error.error.message) {
+      const errorMessages = Object.values(error.error).filter(val => typeof val === 'string');
+      if (errorMessages.length > 0) {
+        return errorMessages.join(', ');
+      }
     }
 
+    // Fallback: Generic error message
     return error.message || 'There was an error, please try again.';
   }
 }
