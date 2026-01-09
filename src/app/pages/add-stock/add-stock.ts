@@ -12,7 +12,7 @@ import {
   catchError,
 } from 'rxjs';
 import { StockService } from '../../features/portfolio/services/stocks';
-import { Router, RouterModule } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 
 interface Stock {
   symbol: string;
@@ -47,11 +47,23 @@ export class AddStock implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
-    // private router: Router,
+    private router: Router,
+    private route: ActivatedRoute,
     private stockService: StockService
   ) {}
 
   ngOnInit(): void {
+    // Check for query params (from watchlist navigation)
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
+      if (params['symbol']) {
+        const symbol = params['symbol'];
+        this.selectedStock = symbol;
+        this.selectedStockValue = symbol;
+        // Fetch price for prefilled symbol
+        this.onStockSelected(symbol);
+      }
+    });
+
     this.searchSubject
       .pipe(
         debounceTime(300),
@@ -59,13 +71,12 @@ export class AddStock implements OnInit, OnDestroy {
         takeUntil(this.destroy$),
         switchMap((query) => {
           if (!query.trim()) {
-            return of([]); // Gunakan of([]) agar tetap berupa Observable
+            return of([]);
           }
           this.loading = true;
-          // PENTING: catchError harus di dalam sini agar stream utama TIDAK MATI jika API error
           return this.stockService.searchStocks(query).pipe(
             catchError((err) => {
-              return of([]); // Jika error, kembalikan array kosong
+              return of([]);
             }),
             finalize(() => (this.loading = false))
           );
@@ -76,7 +87,7 @@ export class AddStock implements OnInit, OnDestroy {
           this.stocks = stocks;
         },
         error: (err) => {
-          console.error('Kritis: Stream Utama Mati!', err);
+          console.error('Critical: Main stream died!', err);
         },
       });
   }
@@ -104,7 +115,7 @@ export class AddStock implements OnInit, OnDestroy {
     }
   }
 
-  // Menambahkan method yang hilang sesuai error template
+  // Add missing methods according to error template
   fetchSuggestions(): void {
     this.onSearch();
   }
@@ -122,7 +133,7 @@ export class AddStock implements OnInit, OnDestroy {
       const symbol = value;
       this.selectedStock = symbol;
 
-      // 🔥 TAMBAHAN: fetch price dari API
+      // fetch price from API
       this.priceLoading = true;
       this.stockService
         .stockPrice(symbol)
@@ -164,7 +175,7 @@ export class AddStock implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           console.log('Stock added successfully!');
-          // ✅ redirect hanya setelah sukses
+          // redirect only after success
           // this.router.navigate(['/portfolio'], {
           //   state: { created: true },
           // });

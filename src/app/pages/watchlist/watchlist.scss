@@ -1,0 +1,180 @@
+.watchlist-container {
+  .mat-mdc-table {
+    background-color: transparent !important;
+  }
+  .mat-mdc-header-row {
+    background-color: #0a0f6c;
+  }
+  .mat-mdc-row {
+    background-color: transparent !important;
+  }
+  .mat-mdc-header-cell {
+    background-color: #0a0f6c;
+    color: #ffffff !important;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 18px;
+    border-bottom: none;
+  }
+  .mat-mdc-cell {
+    background-color: transparent !important;
+    font-size: 18px;
+    font-weight: 500;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  margin-left: 260px;
+  padding: 32px;
+  font-family: 'Outfit', sans-serif;
+}
+
+/* ===== Header ===== */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  .title {
+    font-size: 32px;
+    font-weight: 700;
+    color: #0a0f6c;
+  }
+
+  .add-btn {
+    background-color: #2f5d2f;
+    color: #fff;
+    border-radius: 24px;
+    padding: 8px 20px;
+  }
+}
+
+/* ===== Search ===== */
+.search-wrapper {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+
+  .search-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-right: 12px;
+  }
+
+  .search-input {
+    width: 320px;
+    padding: 10px 14px;
+    border: 2px solid #dce6ff;
+    border-radius: 12px;
+    outline: none;
+    background: transparent;
+    box-shadow: none;
+    width: 100%;
+    font-size: 16px;
+    color: #0a0f6c;
+
+    &::placeholder {
+      color: #0a0f6c;
+      font-size: 16px;
+    }
+  }
+}
+
+/* ===== Table Wrapper ===== */
+.table-wrapper {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 3px solid #0a0f6c;
+}
+
+/* ===== Table ===== */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* ===== Header ===== */
+th.mat-header-cell {
+  background-color: #0a0f6c;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 18px;
+}
+
+tr.mat-row {
+  border-bottom: 2px solid #0a0f6c;
+}
+
+tr.mat-row:last-child {
+  border-bottom: none;
+}
+
+/* ===== Cell ===== */
+td.mat-cell {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0a0f6c;
+  padding: 16px;
+  border-bottom: none;
+}
+
+/* ===== Change color ===== */
+.positive {
+  color: #4a7c59;
+}
+
+.negative {
+  color: #8b3a3a;
+}
+
+/* ===== Action ===== */
+.action-cell {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+
+  .action-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    cursor: pointer;
+  }
+}
+
+::ng-deep .mat-mdc-paginator {
+  font-family: 'Outfit', sans-serif;
+  font-size: 16px;
+  color: #0a0f6c;
+}
+
+::ng-deep .mat-mdc-paginator-range-label {
+  font-size: 16px;
+}
+
+::ng-deep .mat-mdc-icon-button {
+  transform: scale(1.1);
+}
+
+.add-btn {
+  position: relative;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+/* ===== Fix Toast/Snackbar Background ===== */
+::ng-deep .custom-snackbar {
+  .mat-mdc-snack-bar-container {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .mdc-snackbar__surface {
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+}

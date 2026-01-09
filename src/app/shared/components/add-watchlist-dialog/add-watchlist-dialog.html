@@ -1,0 +1,58 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>Add to Watchlist</h2>
+
+  <mat-dialog-content>
+    <div class="form-group">
+      <label for="stock">Search Stock</label>
+      <input
+        name="searchStock"
+        [ngModel]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Search stocks (e.g., AAPL, TSLA)..."
+        class="search-input"
+        autocomplete="off"
+      />
+      <span *ngIf="loading" class="loading-text">Loading...</span>
+    </div>
+
+    <div class="form-group">
+      <label for="stock">Select Stock</label>
+      <select
+        name="selectStock"
+        [ngModel]="selectedStock"
+        (ngModelChange)="onStockSelected($event)"
+        class="stock-select"
+      >
+        <option [value]="null">Select a stock...</option>
+        <option *ngFor="let stock of stocks" [value]="stock.symbol">
+          {{ stock.symbol }}
+        </option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="targetPrice">Target Price (Optional)</label>
+      <input
+        name="targetPrice"
+        type="number"
+        [(ngModel)]="targetPrice"
+        placeholder="Enter target price"
+        class="search-input"
+        step="0.01"
+      />
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" type="button" class="btn-cancel">Cancel</button>
+    <button
+      mat-raised-button
+      (click)="onSubmit()"
+      type="button"
+      class="btn-submit"
+      [disabled]="!selectedStock"
+    >
+      Add to Watchlist
+    </button>
+  </mat-dialog-actions>
+</div>
