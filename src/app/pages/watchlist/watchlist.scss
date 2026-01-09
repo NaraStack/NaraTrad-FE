@@ -131,91 +131,11 @@ td.mat-cell {
   color: #8b3a3a;
 }
 
-/* ===== Target Price Cell ===== */
-.target-price-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  .target-input {
-    width: 100px;
-    padding: 4px 8px;
-    border: 2px solid #0a0f6c;
-    border-radius: 8px;
-    font-size: 16px;
-    color: #0a0f6c;
-    font-weight: 600;
-    outline: none;
-
-    &:focus {
-      border-color: #2f5d2f;
-    }
-  }
-
-  .edit-target-btn {
-    width: 28px;
-    height: 28px;
-    padding: 0;
-
-    .edit-icon {
-      font-size: 16px;
-    }
-  }
-
-  .target-actions {
-    display: flex;
-    gap: 4px;
-
-    button {
-      width: 28px;
-      height: 28px;
-      padding: 0;
-    }
-
-    .save-btn {
-      .save-icon {
-        color: #2f5d2f;
-        font-size: 18px;
-        font-weight: bold;
-      }
-    }
-
-    .cancel-btn {
-      .cancel-icon {
-        color: #8b3a3a;
-        font-size: 18px;
-        font-weight: bold;
-      }
-    }
-  }
-}
-
 /* ===== Action ===== */
 .action-cell {
   display: flex;
   gap: 8px;
   align-items: center;
-
-  .add-portfolio-btn {
-    background-color: #2f5d2f;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-
-    &:hover {
-      background-color: #234623;
-    }
-
-    .add-icon {
-      color: white;
-      font-size: 20px;
-      font-weight: bold;
-    }
-  }
 
   .action-icon {
     width: 24px;

@@ -20,11 +20,6 @@ import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-di
 import { AddWatchlistDialogComponent } from '../../shared/components/add-watchlist-dialog/add-watchlist-dialog';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
 
-interface WatchlistWithEdit extends WatchlistModel {
-  editingTarget?: boolean;
-  tempTargetPrice?: number | null;
-}
-
 @Component({
   selector: 'app-watchlist',
   standalone: true,
@@ -44,8 +39,8 @@ interface WatchlistWithEdit extends WatchlistModel {
   styleUrl: './watchlist.scss',
 })
 export class Watchlist implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['symbol', 'price', 'change', 'targetPrice', 'action'];
-  dataSource = new MatTableDataSource<WatchlistWithEdit>();
+  displayedColumns: string[] = ['symbol', 'price', 'change', 'action'];
+  dataSource = new MatTableDataSource<WatchlistModel>();
   portfolioSymbols: Set<string> = new Set();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -113,17 +108,7 @@ export class Watchlist implements OnInit, AfterViewInit {
     });
   }
 
-  addToWatchlist(data: { symbol: string; targetPrice?: number }): void {
-    // Check if symbol already in portfolio
-    if (this.portfolioSymbols.has(data.symbol)) {
-      this.showToast(
-        'error',
-        'Already in Portfolio',
-        `${data.symbol} is already in your portfolio. Remove it from portfolio first.`
-      );
-      return;
-    }
-
+  addToWatchlist(data: { symbol: string }): void {
     this.watchlistService.addToWatchlist(data).subscribe({
       next: (newItem) => {
         this.dataSource.data = [...this.dataSource.data, newItem];
@@ -134,37 +119,6 @@ export class Watchlist implements OnInit, AfterViewInit {
         this.showToast('error', 'Error', message);
       },
     });
-  }
-
-  editTargetPrice(row: WatchlistWithEdit): void {
-    row.editingTarget = true;
-    row.tempTargetPrice = row.targetPrice || null;
-  }
-
-  saveTargetPrice(row: WatchlistWithEdit): void {
-    if (row.tempTargetPrice !== null && row.tempTargetPrice !== undefined) {
-      // Call API to update target price
-      this.watchlistService
-        .updateTargetPrice(row.id, row.tempTargetPrice)
-        .subscribe({
-          next: () => {
-            row.targetPrice = row.tempTargetPrice!;
-            row.editingTarget = false;
-            this.showToast('success', 'Success', 'Target price updated');
-          },
-          error: () => {
-            this.showToast('error', 'Error', 'Failed to update target price');
-            row.editingTarget = false;
-          },
-        });
-    } else {
-      row.editingTarget = false;
-    }
-  }
-
-  cancelEditTarget(row: WatchlistWithEdit): void {
-    row.editingTarget = false;
-    row.tempTargetPrice = row.targetPrice || null;
   }
 
   addToPortfolio(watchlist: WatchlistModel): void {
