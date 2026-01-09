@@ -1,7 +1,9 @@
 import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,39 +11,49 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 
 import { Watchlist as WatchlistModel } from '../../shared/models/stock';
 import { WatchlistService } from '../../features/watchlist/services/watchlist.service';
+import { PortfolioService } from '../../features/portfolio/services/portfolio';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
 import { AddWatchlistDialogComponent } from '../../shared/components/add-watchlist-dialog/add-watchlist-dialog';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
-import { VolumeFormatPipe } from '../../shared/pipes/volume-format.pipe';
+
+interface WatchlistWithEdit extends WatchlistModel {
+  editingTarget?: boolean;
+  tempTargetPrice?: number | null;
+}
 
 @Component({
   selector: 'app-watchlist',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatTableModule,
     MatPaginatorModule,
+    MatSortModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    VolumeFormatPipe,
   ],
   templateUrl: './watchlist.html',
   styleUrl: './watchlist.scss',
 })
 export class Watchlist implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['symbol', 'price', 'change', 'volume', 'action'];
-  dataSource = new MatTableDataSource<WatchlistModel>();
+  displayedColumns: string[] = ['symbol', 'price', 'change', 'targetPrice', 'action'];
+  dataSource = new MatTableDataSource<WatchlistWithEdit>();
+  portfolioSymbols: Set<string> = new Set();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private watchlistService: WatchlistService,
+    private portfolioService: PortfolioService,
     private router: Router,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
@@ -50,11 +62,26 @@ export class Watchlist implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.dataSource.filterPredicate = (data: WatchlistModel, filter: string) =>
       data.symbol.toLowerCase().includes(filter);
-    this.loadWatchlist();
+    this.loadData();
   }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
+  loadData(): void {
+    forkJoin({
+      watchlist: this.watchlistService.getAllWatchlist(),
+      portfolio: this.portfolioService.getStocks(),
+    }).subscribe({
+      next: ({ watchlist, portfolio }) => {
+        // Store portfolio symbols for validation
+        this.portfolioSymbols = new Set(portfolio.map((s) => s.symbol));
+        this.dataSource.data = watchlist;
+      },
+      error: () => this.showToast('error', 'Error', 'Failed to load data'),
+    });
   }
 
   loadWatchlist(): void {
@@ -76,6 +103,7 @@ export class Watchlist implements OnInit, AfterViewInit {
     const dialogRef = this.dialog.open(AddWatchlistDialogComponent, {
       width: '500px',
       disableClose: true,
+      data: { portfolioSymbols: this.portfolioSymbols },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -86,6 +114,16 @@ export class Watchlist implements OnInit, AfterViewInit {
   }
 
   addToWatchlist(data: { symbol: string; targetPrice?: number }): void {
+    // Check if symbol already in portfolio
+    if (this.portfolioSymbols.has(data.symbol)) {
+      this.showToast(
+        'error',
+        'Already in Portfolio',
+        `${data.symbol} is already in your portfolio. Remove it from portfolio first.`
+      );
+      return;
+    }
+
     this.watchlistService.addToWatchlist(data).subscribe({
       next: (newItem) => {
         this.dataSource.data = [...this.dataSource.data, newItem];
@@ -96,6 +134,37 @@ export class Watchlist implements OnInit, AfterViewInit {
         this.showToast('error', 'Error', message);
       },
     });
+  }
+
+  editTargetPrice(row: WatchlistWithEdit): void {
+    row.editingTarget = true;
+    row.tempTargetPrice = row.targetPrice || null;
+  }
+
+  saveTargetPrice(row: WatchlistWithEdit): void {
+    if (row.tempTargetPrice !== null && row.tempTargetPrice !== undefined) {
+      // Call API to update target price
+      this.watchlistService
+        .updateTargetPrice(row.id, row.tempTargetPrice)
+        .subscribe({
+          next: () => {
+            row.targetPrice = row.tempTargetPrice!;
+            row.editingTarget = false;
+            this.showToast('success', 'Success', 'Target price updated');
+          },
+          error: () => {
+            this.showToast('error', 'Error', 'Failed to update target price');
+            row.editingTarget = false;
+          },
+        });
+    } else {
+      row.editingTarget = false;
+    }
+  }
+
+  cancelEditTarget(row: WatchlistWithEdit): void {
+    row.editingTarget = false;
+    row.tempTargetPrice = row.targetPrice || null;
   }
 
   addToPortfolio(watchlist: WatchlistModel): void {
@@ -138,6 +207,7 @@ export class Watchlist implements OnInit, AfterViewInit {
       duration: 3000,
       horizontalPosition: 'end',
       verticalPosition: 'top',
+      panelClass: ['custom-snackbar'],
     });
   }
 }
