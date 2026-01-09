@@ -40,3 +40,25 @@ export interface PerformanceChartDTO {
   labels: string[]; // Date labels for chart (e.g., ["Jan 01", "Jan 02", ...])
   values: number[]; // Portfolio values for each date
 }
+
+export interface Watchlist {
+  id: number;
+  symbol: string;
+
+  // Real-time data from Finnhub API
+  price: number; // Current price
+  change: number; // Percent change (%)
+  priceChange: number; // Dollar change
+  volume: number; // Trading volume
+
+  // User's target price (optional)
+  targetPrice?: number;
+
+  // Metadata
+  createdAt: string;
+}
+
+export interface WatchlistRequest {
+  symbol: string;
+  targetPrice?: number;
+}
