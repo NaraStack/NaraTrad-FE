@@ -26,6 +26,13 @@ export class WatchlistService {
   }
 
   /**
+   * PUT update target price for a watchlist item
+   */
+  updateTargetPrice(id: number, targetPrice: number): Observable<Watchlist> {
+    return this.http.put<Watchlist>(`${this.apiUrl}/${id}/target-price`, { targetPrice });
+  }
+
+  /**
    * DELETE remove a stock from watchlist
    */
   removeFromWatchlist(id: number): Observable<{ message: string }> {

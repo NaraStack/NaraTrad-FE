@@ -19,7 +19,7 @@
 
   <!-- Table -->
   <div class="table-wrapper">
-    <table mat-table [dataSource]="dataSource">
+    <table mat-table [dataSource]="dataSource" matSort>
       <!-- Symbol -->
       <ng-container matColumnDef="symbol">
         <th mat-header-cell *matHeaderCellDef>Symbol</th>
@@ -28,23 +28,53 @@
 
       <!-- Price -->
       <ng-container matColumnDef="price">
-        <th mat-header-cell *matHeaderCellDef>Price</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
         <td mat-cell *matCellDef="let row">${{ row.price }}</td>
       </ng-container>
 
       <!-- Change -->
       <ng-container matColumnDef="change">
-        <th mat-header-cell *matHeaderCellDef>Change</th>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>Change</th>
         <td mat-cell *matCellDef="let row" [ngClass]="row.change >= 0 ? 'positive' : 'negative'">
-          {{ row.change >= 0 ? '�' : '�' }}
+          {{ row.change >= 0 ? '↑' : '↓' }}
           {{ row.change >= 0 ? '+' : '' }}{{ row.change }}%
         </td>
       </ng-container>
 
-      <!-- Volume -->
-      <ng-container matColumnDef="volume">
-        <th mat-header-cell *matHeaderCellDef>Volume</th>
-        <td mat-cell *matCellDef="let row">{{ row.volume | volumeFormat }}</td>
+      <!-- Target Price -->
+      <ng-container matColumnDef="targetPrice">
+        <th mat-header-cell *matHeaderCellDef>Target Price</th>
+        <td mat-cell *matCellDef="let row">
+          <div class="target-price-cell">
+            <span *ngIf="!row.editingTarget">${{ row.targetPrice || '-' }}</span>
+            <input
+              *ngIf="row.editingTarget"
+              type="number"
+              [(ngModel)]="row.tempTargetPrice"
+              class="target-input"
+              step="0.01"
+              (keyup.enter)="saveTargetPrice(row)"
+              (keyup.escape)="cancelEditTarget(row)"
+            />
+            <button
+              *ngIf="!row.editingTarget"
+              mat-icon-button
+              (click)="editTargetPrice(row)"
+              title="Edit Target Price"
+              class="edit-target-btn"
+            >
+              <span class="edit-icon">✏️</span>
+            </button>
+            <div *ngIf="row.editingTarget" class="target-actions">
+              <button mat-icon-button (click)="saveTargetPrice(row)" title="Save" class="save-btn">
+                <span class="save-icon">✓</span>
+              </button>
+              <button mat-icon-button (click)="cancelEditTarget(row)" title="Cancel" class="cancel-btn">
+                <span class="cancel-icon">✕</span>
+              </button>
+            </div>
+          </div>
+        </td>
       </ng-container>
 
       <!-- Action -->
