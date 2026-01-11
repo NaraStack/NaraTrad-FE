@@ -45,19 +45,12 @@
         <!-- Email -->
         <div class="form-group">
           <label for="email">Email Address</label>
-          <input
-            type="email"
-            id="email"
-            formControlName="email"
-            placeholder="Enter your email"
-          />
+          <input type="email" id="email" formControlName="email" placeholder="Enter your email" />
           <div
             class="error"
             *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.invalid"
           >
-            <span *ngIf="profileForm.get('email')?.errors?.['required']">
-              Email is required
-            </span>
+            <span *ngIf="profileForm.get('email')?.errors?.['required']"> Email is required </span>
             <span *ngIf="profileForm.get('email')?.errors?.['email']">
               Enter a valid email address
             </span>
@@ -65,11 +58,7 @@
         </div>
 
         <!-- Submit Button -->
-        <button
-          type="submit"
-          class="btn-submit"
-          [disabled]="profileForm.invalid || profileLoading"
-        >
+        <button type="submit" class="btn-submit" [disabled]="profileForm.invalid || profileLoading">
           {{ profileLoading ? 'Updating...' : 'Update Profile' }}
         </button>
       </form>
@@ -100,8 +89,7 @@
           <div
             class="error"
             *ngIf="
-              passwordForm.get('oldPassword')?.touched &&
-              passwordForm.get('oldPassword')?.invalid
+              passwordForm.get('oldPassword')?.touched && passwordForm.get('oldPassword')?.invalid
             "
           >
             <span *ngIf="passwordForm.get('oldPassword')?.errors?.['required']">
@@ -127,8 +115,7 @@
           <div
             class="error"
             *ngIf="
-              passwordForm.get('newPassword')?.touched &&
-              passwordForm.get('newPassword')?.invalid
+              passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid
             "
           >
             <span *ngIf="passwordForm.get('newPassword')?.errors?.['required']">
@@ -164,13 +151,11 @@
       </div>
       <div class="info-item">
         <span class="info-label">Member Since</span>
-        <span class="info-value">{{ userProfile.createdAt | date: 'MMM dd, yyyy' }}</span>
+        <span class="info-value">{{ userProfile.createdAt | date : 'MMM dd, yyyy' }}</span>
       </div>
       <div class="info-item">
         <span class="info-label">Last Login</span>
-        <span class="info-value">{{
-          userProfile.lastLogin | date: 'MMM dd, yyyy HH:mm'
-        }}</span>
+        <span class="info-value">{{ userProfile.lastLogin | date : 'MMM dd, yyyy HH:mm' }}</span>
       </div>
     </div>
   </div>
