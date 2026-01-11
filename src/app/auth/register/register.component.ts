@@ -5,6 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ToastComponent } from 'app/shared/components/toast/toast.component';
+import { ToastService } from 'app/core/services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -33,7 +34,8 @@ export class RegisterComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private toast: ToastService
   ) {}
 
   passwordMatchValidator(form: any) {
@@ -64,17 +66,7 @@ export class RegisterComponent {
           this.loading = false;
 
           // TOAST SUCCESS
-          this.snackBar.openFromComponent(ToastComponent, {
-            data: {
-              type: 'success',
-              title: 'Account created!',
-              message: 'Please login.',
-            },
-            duration: 4000,
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-            panelClass: ['toast-panel'],
-          });
+          this.toast.showSuccess('Account created!', 'Please login.', 4000);
 
           // redirect ke login
           this.router.navigate(['/login']);
@@ -85,17 +77,7 @@ export class RegisterComponent {
           this.error = err;
 
           // TOAST ERROR
-          this.snackBar.openFromComponent(ToastComponent, {
-            data: {
-              type: 'error',
-              title: 'Email already exists!',
-              message: 'Try logging in instead.',
-            },
-            duration: 4000,
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-            panelClass: ['toast-panel'],
-          });
+          this.toast.showError('Email already exists!', 'Try logging in instead.', 4000);
         },
       });
   }
