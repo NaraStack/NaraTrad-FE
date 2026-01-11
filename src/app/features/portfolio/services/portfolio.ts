@@ -23,8 +23,8 @@ export class PortfolioService {
   }
 
   // DELETE stock by id
-  deleteStock(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteStock(id: number): Observable<string> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
 
   // POST add atau update stock
