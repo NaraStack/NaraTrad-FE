@@ -1,51 +1,143 @@
+@use 'styles/colors' as *;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+mat-tab-group {
+  margin-top: 16px;
+}
+
+mat-tab-body {
+  padding-top: 16px;
+}
+
 .dashboard-container {
-  .mat-mdc-table {
-    background-color: transparent !important;
-  }
-  .mat-mdc-header-row {
-    background-color: #0a0f6c;
-  }
-  .mat-mdc-row {
-    background-color: transparent !important;
-  }
-  .mat-mdc-header-cell {
-    background-color: #0a0f6c;
-    color: #ffffff !important;
-    font-size: 18px;
-    font-weight: 600;
-    padding: 18px;
-    border-bottom: none;
-  }
-  .mat-mdc-cell {
-    background-color: transparent !important;
-    font-size: 18px;
-    font-weight: 500;
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
   margin-left: 260px;
-  padding: 32px;
-  font-family: 'Outfit', sans-serif;
-  background-color: #ffffff;
+  padding: 32px 40px;
+  background: $white;
+  min-height: 100vh;
 }
 
 /* ===== Header ===== */
 .header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 
   .title {
-    font-size: 32px;
+    font-size: 35px;
     font-weight: 700;
-    color: #0a0f6c;
+    color: $blue;
+  }
+}
+
+.section-title {
+  font-size: 25px;
+  font-weight: 700;
+  color: $blue;
+
+  margin-bottom: 12px;
+  margin-top: 12px;
+}
+
+// user management
+
+.card {
+  border: 3px solid $blue;
+  border-radius: 28px;
+  padding: 24px 32px;
+  width: 100%;
+  max-width: 280px;
+  margin-bottom: 40px;
+  background-color: $white;
+
+  .label {
+    font-size: 20px;
+    font-weight: 600;
+    color: $blue;
   }
 
-  .add-btn {
-    background-color: #2f5d2f;
-    color: #fff;
-    border-radius: 24px;
-    padding: 8px 20px;
+  .value {
+    margin-top: 8px;
+    font-size: 36px;
+    font-weight: 700;
+    color: $green;
   }
+}
+
+.chart-wrapper {
+  width: 80%;
+  max-width: 1000px;
+}
+
+.unique {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.user-grid {
+  display: grid;
+  grid-template-columns: repeat(3, fit-content(280px));
+  gap: 26px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.table-card {
+  max-width: 600px;
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 3px solid $blue;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mat-mdc-header-row {
+  background-color: $blue;
+}
+
+.mat-mdc-header-cell {
+  color: $white;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 10px 24px;
+  border-bottom: 4px solid $blue;
+}
+
+/* ===== BODY ROW ===== */
+.mat-mdc-row {
+  height: 80px;
+}
+
+.mat-mdc-cell {
+  font-size: 20px;
+  font-weight: 500;
+  color: $blue;
+  border-bottom: 3px solid $blue;
+}
+
+.mat-mdc-row:last-child .mat-mdc-cell {
+  border-bottom: none;
+}
+
+.mat-column-count {
+  text-align: center;
+  font-weight: 500;
+}
+
+.empty {
+  text-align: center;
+  padding: 32px;
+  font-size: 18px;
+  color: #6b7280;
 }
