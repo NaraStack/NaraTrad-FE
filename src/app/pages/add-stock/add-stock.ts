@@ -1,18 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Subject, of } from 'rxjs';
 import {
-  Subject,
   debounceTime,
   distinctUntilChanged,
-  takeUntil,
   switchMap,
+  takeUntil,
   finalize,
-  of,
   catchError,
-} from 'rxjs';
+} from 'rxjs/operators';
 import { StockService } from '../../features/portfolio/services/stocks';
-import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
+import { ToastComponent } from 'app/shared/components/toast/toast.component';
+import { ToastService } from 'app/core/services/toast.service';
 
 interface Stock {
   symbol: string;
@@ -26,43 +28,40 @@ interface Stock {
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    // RouterModule
+    ToastComponent,
+    MatSnackBarModule,
+    MatDialogModule,
   ],
   templateUrl: './add-stock.html',
-  styleUrl: './add-stock.scss',
+  styleUrls: ['./add-stock.scss'],
 })
 export class AddStock implements OnInit, OnDestroy {
   searchQuery: string = '';
   stocks: Stock[] = [];
-  selectedStockValue: string = '';
-  loading: boolean = false;
   selectedStock: string | null = null;
   stockPrice: string | null = null;
   priceLoading: boolean = false;
   totalPrice: string | null = null;
   quantity: string = '';
-  // group!: FormGroup;
+  loading: boolean = false;
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private stockService: StockService
+    private stockService: StockService,
+    private toast: ToastService,
+    private dialogRef: MatDialogRef<AddStock>,
+    @Inject(MAT_DIALOG_DATA) public data: { symbol?: string } // optional prefill
   ) {}
 
   ngOnInit(): void {
-    // Check for query params (from watchlist navigation)
-    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
-      if (params['symbol']) {
-        const symbol = params['symbol'];
-        this.selectedStock = symbol;
-        this.selectedStockValue = symbol;
-        // Fetch price for prefilled symbol
-        this.onStockSelected(symbol);
-      }
-    });
+    // Prefill symbol jika dikirim dari parent
+    if (this.data.symbol) {
+      this.selectedStock = this.data.symbol;
+      this.searchQuery = this.data.symbol;
+      this.fetchStockPrice(this.data.symbol);
+    }
 
     this.searchSubject
       .pipe(
@@ -70,36 +69,15 @@ export class AddStock implements OnInit, OnDestroy {
         distinctUntilChanged(),
         takeUntil(this.destroy$),
         switchMap((query) => {
-          if (!query.trim()) {
-            return of([]);
-          }
+          if (!query.trim()) return of([]);
           this.loading = true;
           return this.stockService.searchStocks(query).pipe(
-            catchError((err) => {
-              return of([]);
-            }),
+            catchError(() => of([])),
             finalize(() => (this.loading = false))
           );
         })
       )
-      .subscribe({
-        next: (stocks) => {
-          this.stocks = stocks;
-        },
-        error: (err) => {
-          console.error('Critical: Main stream died!', err);
-        },
-      });
-  }
-
-  // Method baru menggunakan ngModelChange
-  onSearchChange(value: string): void {
-    this.searchQuery = value;
-    if (value && value.length >= 1) {
-      this.searchSubject.next(value);
-    } else {
-      this.stocks = [];
-    }
+      .subscribe((stocks) => (this.stocks = stocks));
   }
 
   ngOnDestroy(): void {
@@ -107,63 +85,33 @@ export class AddStock implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  onSearch(): void {
-    if (this.searchQuery.length >= 1) {
-      this.searchSubject.next(this.searchQuery);
-    } else {
-      this.stocks = [];
-    }
+  onSearchChange(value: string): void {
+    this.searchQuery = value;
+    if (value && value.length >= 1) this.searchSubject.next(value);
+    else this.stocks = [];
   }
 
-  // Add missing methods according to error template
-  fetchSuggestions(): void {
-    this.onSearch();
+  onStockSelected(symbol: string): void {
+    this.selectedStock = symbol;
+    this.fetchStockPrice(symbol);
   }
 
-  getStockValue(stock: Stock): string {
-    return `${stock.symbol}`;
-  }
-
-  getStockDisplay(stock: Stock): string {
-    return `${stock.symbol}`;
-  }
-
-  onStockSelected(value: string): void {
-    if (value) {
-      const symbol = value;
-      this.selectedStock = symbol;
-
-      // fetch price from API
-      this.priceLoading = true;
-      this.stockService
-        .stockPrice(symbol)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (price) => {
-            console.log('Fetched price: ', price);
-            this.stockPrice = price.toString();
-          },
-          error: () => {
-            this.stockPrice = null;
-          },
-          complete: () => {
-            this.priceLoading = false;
-          },
-        });
-    } else {
-      this.searchQuery = '';
-      this.selectedStock = null;
-      this.stockPrice = null;
-    }
+  private fetchStockPrice(symbol: string): void {
+    this.priceLoading = true;
+    this.stockService
+      .stockPrice(symbol)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (price) => (this.stockPrice = price.toString()),
+        error: () => (this.stockPrice = null),
+        complete: () => (this.priceLoading = false),
+      });
   }
 
   calculateTotalPrice(): void {
     const qty = Number(this.quantity);
     const price = Number(this.stockPrice);
-    if (this.quantity && this.stockPrice) {
-      const total = qty * price;
-      this.totalPrice = total.toString();
-    }
+    if (qty && price) this.totalPrice = (qty * price).toString();
   }
 
   onSubmit(): void {
@@ -174,15 +122,29 @@ export class AddStock implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          console.log('Stock added successfully!');
-          // redirect only after success
-          // this.router.navigate(['/portfolio'], {
-          //   state: { created: true },
-          // });
+          this.toast.showSuccess(
+            'Stock added!',
+            'Stock successfully added to your portfolio.',
+            2000
+          );
+          this.dialogRef.close({ symbol: this.selectedStock, quantity: this.quantity });
         },
         error: (err) => {
-          console.error('Failed to add stock!', err);
+          console.error(err);
+          this.toast.showError('Failed to add stock', 'Please try again later.', 4000);
         },
       });
+  }
+
+  onCancel(): void {
+    this.dialogRef.close();
+  }
+
+  getStockValue(stock: Stock): string {
+    return stock.symbol;
+  }
+
+  getStockDisplay(stock: Stock): string {
+    return `${stock.symbol} - ${stock.name || ''}`;
   }
 }
