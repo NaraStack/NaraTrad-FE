@@ -32,6 +32,10 @@
     <div class="form-group" *ngIf="selectedStock">
       <label>Selected Stock</label>
       <input type="text" class="search-input" [value]="selectedStock" disabled />
+      <div class="price-display" *ngIf="selectedStockPrice !== null">
+        <strong>Current Price:</strong> 
+        <span class="price-value">${{ selectedStockPrice | number:'1.2-2' }}</span>
+    </div>
     </div>
 
     <!-- Target Price Input -->
