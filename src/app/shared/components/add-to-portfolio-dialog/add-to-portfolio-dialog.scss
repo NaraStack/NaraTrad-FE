@@ -11,7 +11,6 @@ h2 {
 
 .form-group {
   margin-bottom: 20px;
-  position: relative;
 
   label {
     display: block;
@@ -21,8 +20,7 @@ h2 {
     font-size: 14px;
   }
 
-  .search-input,
-  .stock-select {
+  .search-input {
     width: 100%;
     padding: 12px;
     border: 1px solid #ddd;
@@ -38,7 +36,12 @@ h2 {
     &:disabled {
       background-color: #f5f5f5;
       cursor: not-allowed;
+      color: #666;
     }
+  }
+
+  .price-display {
+    position: relative;
   }
 
   .loading-text {
@@ -46,46 +49,6 @@ h2 {
     font-size: 12px;
     color: #666;
     margin-top: 4px;
-  }
-}
-
-.stock-search-wrapper {
-  position: relative;
-
-  .search-input {
-    width: 100%;
-  }
-
-  .stock-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #ddd;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    max-height: 220px;
-    overflow-y: auto;
-    z-index: 1000;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-    .stock-dropdown-item {
-      padding: 12px;
-      cursor: pointer;
-      border-bottom: 1px solid #f0f0f0;
-      font-size: 14px;
-      transition: background-color 0.2s;
-
-      &:last-child {
-        border-bottom: none;
-      }
-
-      &:hover {
-        background-color: #f9f9f9;
-        color: #0a0f6c;
-      }
-    }
   }
 }
 

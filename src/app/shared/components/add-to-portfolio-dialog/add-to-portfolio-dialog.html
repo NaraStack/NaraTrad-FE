@@ -1,0 +1,68 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>Add to Portfolio</h2>
+
+  <mat-dialog-content>
+    <!-- Symbol Display (Read-only) -->
+    <div class="form-group">
+      <label for="symbol">Stock Symbol</label>
+      <input
+        type="text"
+        class="search-input"
+        [value]="symbol"
+        disabled
+      />
+    </div>
+
+    <!-- Stock Price Display -->
+    <div class="form-group">
+      <label for="price">Stock Price</label>
+      <div class="price-display">
+        <input
+          type="text"
+          class="search-input"
+          [value]="stockPrice !== null ? '$' + stockPrice : 'Loading...'"
+          disabled
+        />
+        <span *ngIf="priceLoading" class="loading-text">Fetching price...</span>
+      </div>
+    </div>
+
+    <!-- Quantity Input -->
+    <div class="form-group">
+      <label for="quantity">Quantity</label>
+      <input
+        name="quantity"
+        type="number"
+        [(ngModel)]="quantity"
+        (ngModelChange)="calculateTotalPrice()"
+        placeholder="Enter quantity"
+        class="search-input"
+        min="1"
+      />
+    </div>
+
+    <!-- Total Price Display -->
+    <div class="form-group">
+      <label for="total_price">Total Price</label>
+      <input
+        type="text"
+        [value]="totalPrice ? ('$' + totalPrice) : '$0.00'"
+        class="search-input"
+        disabled
+      />
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" type="button" class="btn-cancel" [disabled]="isSubmitting">Cancel</button>
+    <button
+      mat-raised-button
+      (click)="onSubmit()"
+      type="button"
+      class="btn-submit"
+      [disabled]="!quantity || !stockPrice || isSubmitting"
+    >
+      {{ isSubmitting ? 'Adding...' : 'Add to Portfolio' }}
+    </button>
+  </mat-dialog-actions>
+</div>

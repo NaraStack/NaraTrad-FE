@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, Optional } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Subject, of } from 'rxjs';
@@ -51,13 +51,18 @@ export class AddStock implements OnInit, OnDestroy {
   constructor(
     private stockService: StockService,
     private toast: ToastService,
-    private dialogRef: MatDialogRef<AddStock>,
-    @Inject(MAT_DIALOG_DATA) public data: { symbol?: string } // optional prefill
-  ) {}
+    @Optional() private dialogRef: MatDialogRef<AddStock> | null,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: { symbol?: string } | null
+  ) {
+    // If data is null, initialize it
+    if (!this.data) {
+      this.data = {};
+    }
+  }
 
   ngOnInit(): void {
     // Prefill symbol jika dikirim dari parent
-    if (this.data.symbol) {
+    if (this.data?.symbol) {
       this.selectedStock = this.data.symbol;
       this.searchQuery = this.data.symbol;
       this.fetchStockPrice(this.data.symbol);
@@ -127,7 +132,9 @@ export class AddStock implements OnInit, OnDestroy {
             'Stock successfully added to your portfolio.',
             2000
           );
-          this.dialogRef.close({ symbol: this.selectedStock, quantity: this.quantity });
+          if (this.dialogRef) {
+            this.dialogRef.close({ symbol: this.selectedStock, quantity: this.quantity });
+          }
         },
         error: (err) => {
           console.error(err);
@@ -137,7 +144,9 @@ export class AddStock implements OnInit, OnDestroy {
   }
 
   onCancel(): void {
-    this.dialogRef.close();
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
   }
 
   getStockValue(stock: Stock): string {
