@@ -10,7 +10,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { Watchlist as WatchlistModel } from '../../shared/models/stock';
@@ -18,6 +17,7 @@ import { WatchlistService } from '../../features/watchlist/services/watchlist.se
 import { PortfolioService } from '../../features/portfolio/services/portfolio';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
 import { AddWatchlistDialogComponent } from '../../shared/components/add-watchlist-dialog/add-watchlist-dialog';
+import { AddToPortfolioDialogComponent } from '../../shared/components/add-to-portfolio-dialog/add-to-portfolio-dialog';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
 import { ToastService } from 'app/core/services/toast.service';
 
@@ -50,7 +50,6 @@ export class Watchlist implements OnInit, AfterViewInit {
   constructor(
     private watchlistService: WatchlistService,
     private portfolioService: PortfolioService,
-    private router: Router,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private toast: ToastService
@@ -102,11 +101,18 @@ export class Watchlist implements OnInit, AfterViewInit {
     this.dataSource.paginator?.firstPage();
   }
 
-  openAddDialog(): void {
+  openAddDialog(prefilledSymbol?: string): void {
+    // Get current watchlist symbols
+    const watchlistSymbols = new Set(this.dataSource.data.map((w) => w.symbol));
+
     const dialogRef = this.dialog.open(AddWatchlistDialogComponent, {
       width: '500px',
       disableClose: true,
-      data: { portfolioSymbols: this.portfolioSymbols },
+      data: {
+        portfolioSymbols: this.portfolioSymbols,
+        watchlistSymbols: watchlistSymbols,
+        prefilledSymbol: prefilledSymbol,
+      },
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -116,7 +122,7 @@ export class Watchlist implements OnInit, AfterViewInit {
     });
   }
 
-  addToWatchlist(data: { symbol: string }): void {
+  addToWatchlist(data: { symbol: string; targetPrice?: number }): void {
     this.watchlistService.addToWatchlist(data).subscribe({
       next: (newItem) => {
         // Tambahkan item baru ke datasource
@@ -135,9 +141,43 @@ export class Watchlist implements OnInit, AfterViewInit {
   }
 
   addToPortfolio(watchlist: WatchlistModel): void {
-    // Navigate to add-stock page with symbol prefilled
-    this.router.navigate(['/add-stock'], {
-      queryParams: { symbol: watchlist.symbol },
+    // Open dialog to add stock to portfolio with pre-filled symbol
+    const dialogRef = this.dialog.open(AddToPortfolioDialogComponent, {
+      width: '500px',
+      disableClose: true,
+      data: { symbol: watchlist.symbol },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        // Stock was successfully added to portfolio, remove from watchlist
+        this.removeFromWatchlistAfterAddingToPortfolio(watchlist);
+      }
+    });
+  }
+
+  private removeFromWatchlistAfterAddingToPortfolio(watchlist: WatchlistModel): void {
+    this.watchlistService.removeFromWatchlist(watchlist.id).subscribe({
+      next: () => {
+        // Remove from dataSource
+        this.dataSource.data = this.dataSource.data.filter((w) => w.id !== watchlist.id);
+
+        // Show success toast
+        this.toast.showSuccess(
+          'Success',
+          `${watchlist.symbol} removed from watchlist (now in portfolio)`,
+          3000
+        );
+      },
+      error: () => {
+        // If removal fails, just reload data to keep things in sync
+        this.loadWatchlist();
+        this.toast.showError(
+          'Warning',
+          'Stock added to portfolio but could not remove from watchlist',
+          4000
+        );
+      },
     });
   }
 

@@ -11,10 +11,13 @@ import { StockService } from '../../../features/portfolio/services/stocks';
 interface Stock {
   symbol: string;
   name: string;
+  price?: number;
 }
 
 interface DialogData {
-  portfolioSymbols: Set<string>;
+  portfolioSymbols?: Set<string>;
+  watchlistSymbols?: Set<string>;
+  prefilledSymbol?: string;
 }
 
 @Component({
@@ -38,6 +41,9 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
   targetPrice: number | null = null;
   loading: boolean = false;
   portfolioSymbols: Set<string>;
+  watchlistSymbols: Set<string>;
+  isQuickAdd: boolean = false; // For pre-filled symbol scenario
+  selectedStockPrice: number | null = null;
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -48,6 +54,14 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: DialogData
   ) {
     this.portfolioSymbols = data?.portfolioSymbols || new Set();
+    this.watchlistSymbols = data?.watchlistSymbols || new Set();
+
+    // If prefilledSymbol is provided, this is a quick add scenario
+    if (data?.prefilledSymbol) {
+      this.isQuickAdd = true;
+      this.selectedStock = data.prefilledSymbol;
+      this.searchQuery = data.prefilledSymbol;
+    }
   }
 
   ngOnInit(): void {
@@ -69,8 +83,10 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (stocks) => {
-          // Filter out stocks that are already in portfolio
-          this.stocks = stocks.filter((s) => !this.portfolioSymbols.has(s.symbol));
+          // Filter out stocks that are already in portfolio or watchlist
+          this.stocks = stocks.filter(
+            (s) => !this.portfolioSymbols.has(s.symbol) && !this.watchlistSymbols.has(s.symbol)
+          );
         },
       });
   }
@@ -89,14 +105,6 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  onStockSelected(value: string): void {
-    if (value) {
-      this.selectedStock = value;
-    } else {
-      this.selectedStock = null;
-    }
-  }
-
   onCancel(): void {
     this.dialogRef.close();
   }
@@ -109,4 +117,36 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
       targetPrice: this.targetPrice,
     });
   }
+
+  /**
+   * Get stock display string for dropdown/UI
+   */
+  getStockDisplay(stock: Stock): string {
+    return `${stock.symbol} - ${stock.name || ''}`;
+  }
+
+  /**
+   * Get stock value for selection
+   */
+  getStockValue(stock: Stock): string {
+    return stock.symbol;
+  }
+
+  /**
+   * Handle stock selection from dropdown
+   */
+  onStockSelected(symbol: string): void {
+    this.selectedStock = symbol;
+    this.stocks = []; // Close dropdown
+    
+    // fetch price
+    this.stockService.stockPrice(symbol).subscribe({
+        next: (price) => {
+        this.selectedStockPrice = price;
+        },
+        error: () => {
+        this.selectedStockPrice = null;
+        }
+    });
+    }
 }
