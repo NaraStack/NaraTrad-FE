@@ -6,6 +6,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { Role } from '../../core/models/auth.model';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ToastComponent } from 'app/shared/components/toast/toast.component';
+import { ToastService } from 'app/core/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -29,7 +30,8 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private toast: ToastService
   ) {}
 
   login() {
@@ -48,17 +50,7 @@ export class LoginComponent {
         this.loading = false;
 
         // TOAST SUCCESS
-        this.snackBar.openFromComponent(ToastComponent, {
-          data: {
-            type: 'success',
-            title: 'Login successful!',
-            message: 'Redirecting to dashboard...',
-          },
-          duration: 3000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          panelClass: ['toast-panel'],
-        });
+        this.toast.showSuccess('Login successful!', 'Redirecting to dashboard...', 3000);
 
         // ambil returnUrl kalau ada
         const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
@@ -77,17 +69,11 @@ export class LoginComponent {
         this.loading = false;
 
         // TOAST ERROR
-        this.snackBar.openFromComponent(ToastComponent, {
-          data: {
-            type: 'error',
-            title: 'Invalid email or password!',
-            message: 'Please check your credentials and try again.',
-          },
-          duration: 4000,
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          panelClass: ['toast-panel'],
-        });
+        this.toast.showError(
+          'Invalid email or password!',
+          'Please check your credentials and try again.',
+          4000
+        );
       },
     });
   }

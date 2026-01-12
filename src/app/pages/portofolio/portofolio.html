@@ -2,7 +2,8 @@
   <!-- Header -->
   <div class="header">
     <h1 class="title">Portfolio</h1>
-    <a mat-raised-button class="add-btn" routerLink="/add-stock">+ Add Stock</a>
+    <!-- <a mat-raised-button class="add-btn" routerLink="/add-stock">+ Add Stock</a> -->
+    <a mat-raised-button class="add-btn" (click)="openAddDialog()">+ Add Stock</a>
   </div>
 
   <!-- Search -->
@@ -15,6 +16,10 @@
       placeholder="Search stock..."
       (keyup)="applyFilter($event)"
     />
+  </div>
+
+  <div class="toolbar">
+    <button class="export-csv" mat-raised-button (click)="exportToCSV()">Export CSV</button>
   </div>
 
   <!-- Table -->
