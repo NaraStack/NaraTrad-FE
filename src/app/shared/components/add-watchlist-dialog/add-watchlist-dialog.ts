@@ -11,6 +11,7 @@ import { StockService } from '../../../features/portfolio/services/stocks';
 interface Stock {
   symbol: string;
   name: string;
+  price?: number;
 }
 
 interface DialogData {
@@ -42,6 +43,7 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
   portfolioSymbols: Set<string>;
   watchlistSymbols: Set<string>;
   isQuickAdd: boolean = false; // For pre-filled symbol scenario
+  selectedStockPrice: number | null = null;
 
   private searchSubject = new Subject<string>();
   private destroy$ = new Subject<void>();
@@ -136,5 +138,15 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
   onStockSelected(symbol: string): void {
     this.selectedStock = symbol;
     this.stocks = []; // Close dropdown
-  }
+    
+    // fetch price
+    this.stockService.stockPrice(symbol).subscribe({
+        next: (price) => {
+        this.selectedStockPrice = price;
+        },
+        error: () => {
+        this.selectedStockPrice = null;
+        }
+    });
+    }
 }
