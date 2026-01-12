@@ -9,65 +9,45 @@
   <nav class="sidebar__menu">
     <!-- Admin Menu -->
     @if (isAdmin) {
-      <a routerLink="/admin/dashboard" routerLinkActive="active" class="menu-item">
-        <img src="/icon-dashboard.png" alt="Dashboard" class="icon" />
-        <span class="label">Dashboard</span>
-      </a>
+    <a routerLink="/admin/dashboard" routerLinkActive="active" class="menu-item">
+      <img src="/icon-dashboard.png" alt="Dashboard" class="icon" />
+      <span class="label">Dashboard</span>
+    </a>
 
-      <a routerLink="/admin/settings" routerLinkActive="active" class="menu-item">
-        <img
-          src="/icon-settings.png"
-          alt="Settings"
-          class="icon"
-        />
-        <span class="label">Settings</span>
-      </a>
+    <a routerLink="/admin/settings" routerLinkActive="active" class="menu-item">
+      <img src="/icon-settings.png" alt="Settings" class="icon" />
+      <span class="label">Settings</span>
+    </a>
 
-      <a (click)="onLogout()" class="menu-logout-admin">
-      <img
-        src="/icon-logout.png"
-        alt="Logout"
-        class="icon"
-      />
+    <a (click)="onLogout()" class="menu-logout-admin">
+      <img src="/icon-logout.png" alt="Logout" class="icon" />
       <span class="label">Logout</span>
     </a>
     }
 
     <!-- User Menu -->
     @if (!isAdmin) {
-      <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
-        <img src="/icon-dashboard.png" alt="Dashboard" class="icon" />
-        <span class="label">Dashboard</span>
-      </a>
+    <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
+      <img src="/icon-dashboard.png" alt="Dashboard" class="icon" />
+      <span class="label">Dashboard</span>
+    </a>
 
-      <a routerLink="/portfolio" routerLinkActive="active" class="menu-item">
-        <img src="/icon-portfolio.png" alt="Dashboard" class="icon" />
-        <span class="label">Portfolio</span>
-      </a>
+    <a routerLink="/portfolio" routerLinkActive="active" class="menu-item">
+      <img src="/icon-portfolio.png" alt="Dashboard" class="icon" />
+      <span class="label">Portfolio</span>
+    </a>
 
-      <a routerLink="/watchlist" routerLinkActive="active" class="menu-item">
-        <img
-          src="/icon-watchlist.png"
-          alt="Dashboard"
-          class="icon"
-        />
-        <span class="label">Watchlist</span>
-      </a>
+    <a routerLink="/watchlist" routerLinkActive="active" class="menu-item">
+      <img src="/icon-watchlist.png" alt="Dashboard" class="icon" />
+      <span class="label">Watchlist</span>
+    </a>
 
-      <a routerLink="/settings" routerLinkActive="active" class="menu-item">
-        <img
-          src="/icon-settings.png"
-          alt="Dashboard"
-          class="icon"
-        />
-        <span class="label">Settings</span>
-      </a>
-      <a (click)="onLogout()" class="menu-logout">
-      <img
-        src="/icon-logout.png"
-        alt="Logout"
-        class="icon"
-      />
+    <a routerLink="/settings" routerLinkActive="active" class="menu-item">
+      <img src="/icon-settings.png" alt="Dashboard" class="icon" />
+      <span class="label">Settings</span>
+    </a>
+    <a (click)="onLogout()" class="menu-logout">
+      <img src="/icon-logout.png" alt="Logout" class="icon" />
       <span class="label">Logout</span>
     </a>
     }

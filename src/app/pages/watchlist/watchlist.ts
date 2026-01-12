@@ -19,6 +19,7 @@ import { PortfolioService } from '../../features/portfolio/services/portfolio';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
 import { AddWatchlistDialogComponent } from '../../shared/components/add-watchlist-dialog/add-watchlist-dialog';
 import { ToastComponent } from '../../shared/components/toast/toast.component';
+import { ToastService } from 'app/core/services/toast.service';
 
 @Component({
   selector: 'app-watchlist',
@@ -51,7 +52,8 @@ export class Watchlist implements OnInit, AfterViewInit {
     private portfolioService: PortfolioService,
     private router: Router,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -75,7 +77,10 @@ export class Watchlist implements OnInit, AfterViewInit {
         this.portfolioSymbols = new Set(portfolio.map((s) => s.symbol));
         this.dataSource.data = watchlist;
       },
-      error: () => this.showToast('error', 'Error', 'Failed to load data'),
+      error: () => {
+        // TOAST ERROR
+        this.toast.showError('Error', 'Failed to load data', 4000);
+      },
     });
   }
 
@@ -84,7 +89,10 @@ export class Watchlist implements OnInit, AfterViewInit {
       next: (data) => {
         this.dataSource.data = data;
       },
-      error: () => this.showToast('error', 'Error', 'Failed to load watchlist'),
+      error: () => {
+        // TOAST ERROR
+        this.toast.showError('Error', 'Failed to load watchlist', 4000);
+      },
     });
   }
 
@@ -111,12 +119,17 @@ export class Watchlist implements OnInit, AfterViewInit {
   addToWatchlist(data: { symbol: string }): void {
     this.watchlistService.addToWatchlist(data).subscribe({
       next: (newItem) => {
+        // Tambahkan item baru ke datasource
         this.dataSource.data = [...this.dataSource.data, newItem];
-        this.showToast('success', 'Success', `${data.symbol} added to watchlist`);
+
+        // TOAST SUCCESS
+        this.toast.showSuccess('Success', `${data.symbol} added to watchlist`, 3000);
       },
       error: (err) => {
         const message = err.error?.message || 'Failed to add to watchlist';
-        this.showToast('error', 'Error', message);
+
+        // TOAST ERROR
+        this.toast.showError('Error', message, 4000);
       },
     });
   }
@@ -149,19 +162,24 @@ export class Watchlist implements OnInit, AfterViewInit {
     this.watchlistService.removeFromWatchlist(watchlist.id).subscribe({
       next: () => {
         this.dataSource.data = this.dataSource.data.filter((w) => w.id !== watchlist.id);
-        this.showToast('success', 'Success', `${watchlist.symbol} removed from watchlist`);
+
+        // TOAST SUCCESS
+        this.toast.showSuccess('Success', `${watchlist.symbol} removed from watchlist`, 3000);
       },
-      error: () => this.showToast('error', 'Error', 'Failed to remove from watchlist'),
+      error: () => {
+        // TOAST ERROR
+        this.toast.showError('Error', 'Failed to remove from watchlist', 4000);
+      },
     });
   }
 
-  private showToast(type: 'success' | 'error', title: string, message: string): void {
-    this.snackBar.openFromComponent(ToastComponent, {
-      data: { type, title, message },
-      duration: 3000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-      panelClass: ['custom-snackbar'],
-    });
-  }
+  // private showToast(type: 'success' | 'error', title: string, message: string): void {
+  //   this.snackBar.openFromComponent(ToastComponent, {
+  //     data: { type, title, message },
+  //     duration: 3000,
+  //     horizontalPosition: 'end',
+  //     verticalPosition: 'top',
+  //     panelClass: ['custom-snackbar'],
+  //   });
+  // }
 }
