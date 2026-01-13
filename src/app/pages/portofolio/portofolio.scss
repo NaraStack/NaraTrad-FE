@@ -1,3 +1,5 @@
+@use 'styles/colors' as *;
+
 .portfolio-container {
   .mat-mdc-table {
     background-color: transparent !important;
@@ -26,6 +28,36 @@
   margin-left: 260px;
   padding: 32px;
   font-family: 'Outfit', sans-serif;
+}
+
+.toolbar {
+  display: flex; // tombol di kanan
+  margin-bottom: 1rem;
+}
+
+button.export-csv {
+  background-color: $blue-100;
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    background-color: $blue;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  &:active {
+    background-color: $blue-150;
+    transform: translateY(1px);
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.4);
+  }
 }
 
 /* ===== Header ===== */
@@ -119,7 +151,7 @@ td.mat-cell {
   font-weight: 600;
   color: #0a0f6c;
   padding: 16px;
-  border-bottom: none; // 🔥 HAPUS border td
+  border-bottom: none;
 }
 
 /* ===== Change color ===== */

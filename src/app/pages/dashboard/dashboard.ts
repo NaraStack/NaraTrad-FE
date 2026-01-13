@@ -4,6 +4,7 @@ import {
   AfterViewInit,
   ViewChild,
   ChangeDetectorRef,
+  ElementRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -15,12 +16,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
+import { AuthService } from '../../core/services/auth.service';
+
 
 import { Router } from '@angular/router';
 
-import { Stock } from '../../shared/models/stock';
+import { Stock, DashboardData } from '../../shared/models/stock';
 import { PortfolioService } from '../../features/portfolio/services/portfolio';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
+import { Chart, registerables } from 'chart.js';
+
+Chart.register(...registerables);
 
 @Component({
   selector: 'app-dashboard',
@@ -40,97 +46,197 @@ import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-di
   styleUrl: './dashboard.scss',
 })
 export class Dashboard implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['symbol', 'price', 'change', 'quantity'];
-  dataSource = new MatTableDataSource<Stock>();
-
+  // Dashboard Summary Data
   totalPortfolioValue = 0;
   totalStocksOwned = 0;
+  totalInvestment = 0;
+  totalGainLoss = 0;
+  roi = 0;
+  dailyChange = 0;
+  dailyChangePercent = 0;
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  // Stock Lists
+  topGainers: Stock[] = [];
+  topLosers: Stock[] = [];
+  largestHoldings: Stock[] = [];
+
+  // Chart
+  @ViewChild('performanceChart') performanceChartRef!: ElementRef<HTMLCanvasElement>;
+  private chart: Chart | null = null;
+  userName = 'User';
 
   constructor(
     private portfolioService: PortfolioService,
     private router: Router,
-    private dialog: MatDialog,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    this.dataSource.filterPredicate = (data: Stock, filter: string) =>
-      data.symbol.toLowerCase().includes(filter);
+  this.loadDashboard();
 
-    this.loadStocks();
-    this.loadSummary();
-  }
+  this.authService.currentUser$.subscribe(user => {
+    this.userName = user?.fullName ?? 'User';
+  });
+}
+
 
   ngAfterViewInit(): void {
-    this.dataSource.paginator = this.paginator;
+    // Chart will be initialized after data is loaded
   }
 
   /* ===================== DATA ===================== */
 
-  private loadStocks(): void {
-    this.portfolioService.getStocks().subscribe({
+  private loadDashboard(): void {
+    this.portfolioService.getDashboard().subscribe({
+      next: (data: DashboardData) => {
+        // Set summary data
+        this.totalPortfolioValue = data.totalPortfolioValue || 0;
+        this.totalStocksOwned = data.totalStocksOwned || 0;
+        this.totalInvestment = data.totalInvestment || 0;
+        this.totalGainLoss = data.totalGainLoss || 0;
+        this.roi = data.roi || 0;
+        this.dailyChange = data.dailyChange || 0;
+        this.dailyChangePercent = data.dailyChangePercent || 0;
+
+        // Process stock lists
+        this.processStockLists(data.stockList || []);
+
+        // Initialize chart
+        this.cd.detectChanges();
+        this.loadPerformanceChart();
+      },
+      error: (err) => {
+        console.error('Failed to load dashboard data', err);
+      },
+    });
+  }
+
+  private processStockLists(stocks: Stock[]): void {
+    // Top Gainers - sorted by change % (descending)
+    this.topGainers = [...stocks]
+      .filter(s => s.change > 0)
+      .sort((a, b) => b.change - a.change)
+      .slice(0, 3);
+
+    // Top Losers - sorted by change % (ascending)
+    this.topLosers = [...stocks]
+      .filter(s => s.change < 0)
+      .sort((a, b) => a.change - b.change)
+      .slice(0, 3);
+
+    // Largest Holdings - sorted by total value (descending)
+    this.largestHoldings = [...stocks]
+      .sort((a, b) => b.totalValue - a.totalValue)
+      .slice(0, 3);
+  }
+
+  private loadPerformanceChart(): void {
+    this.portfolioService.getPerformanceChart().subscribe({
       next: (data) => {
-        this.dataSource.data = data;
-        this.cd.detectChanges();
+        this.initializeChart(data.labels, data.values);
       },
       error: (err) => {
-        console.error('Failed to load stocks', err);
-      },
-    });
-  }
-
-  private loadSummary(): void {
-    this.portfolioService.getPortfolioSummary().subscribe({
-      next: (summary) => {
-        this.totalPortfolioValue = summary.totalPortfolioValue;
-        this.totalStocksOwned = summary.totalStocksOwned;
-        this.cd.detectChanges();
-      },
-      error: (err) => {
-        console.error('Failed to load portfolio summary', err);
-      },
-    });
-  }
-
-  applyFilter(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = value.trim().toLowerCase();
-    this.dataSource.paginator?.firstPage();
-  }
-
-  goToAddStock(): void {
-    this.router.navigate(['/add-stock']);
-  }
-
-  confirmDelete(stock: Stock): void {
-    const dialogRef = this.dialog.open(ConfirmDialog, {
-      width: '360px',
-      disableClose: true,
-      data: {
-        title: 'Delete Stock',
-        message: `Are you sure you want to delete ${stock.symbol}? This action cannot be undone.`,
-      },
-    });
-
-    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-      if (confirmed) {
-        this.deleteStock(stock);
+        console.error('Failed to load chart data', err);
       }
     });
   }
 
-  private deleteStock(stock: Stock): void {
-    this.portfolioService.deleteStock(stock.id).subscribe({
-      next: () => {
-        this.dataSource.data = this.dataSource.data.filter(
-          (s) => s.id !== stock.id
-        );
+  private initializeChart(labels: string[], dataPoints: number[]): void {
+    if (!this.performanceChartRef) return;
+
+    const ctx = this.performanceChartRef.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    // Destroy existing chart if any
+    if (this.chart) {
+      this.chart.destroy();
+    }
+
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(45, 106, 79, 0.3)');
+    gradient.addColorStop(1, 'rgba(45, 106, 79, 0.01)');
+
+    this.chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Portfolio Value ($)',
+          data: dataPoints,
+          borderColor: '#2d6a4f',
+          backgroundColor: gradient,
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#2d6a4f',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7
+        }]
       },
-      error: (err) => {
-        console.error('Failed to delete stock', err);
-      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            backgroundColor: '#000851',
+            padding: 12,
+            titleFont: {
+              family: 'Outfit',
+              size: 14,
+              weight: 600
+            },
+            bodyFont: {
+              family: 'Outfit',
+              size: 13
+            },
+            callbacks: {
+              label: (context) => {
+                const value = context.parsed.y;
+                return value !== null ? '$' + value.toLocaleString('en-US', {minimumFractionDigits: 2}) : '$0.00';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: {
+              font: {
+                family: 'Outfit',
+                size: 12
+              },
+              callback: function(value) {
+                return '$' + (value as number).toLocaleString();
+              }
+            },
+            grid: {
+              color: 'rgba(0,0,0,0.05)'
+            }
+          },
+          x: {
+            ticks: {
+              font: {
+                family: 'Outfit',
+                size: 12
+              }
+            },
+            grid: {
+              display: false
+            }
+          }
+        }
+      }
     });
+  }
+
+  goToAddStock(): void {
+    this.router.navigate(['/add-stock']);
   }
 }

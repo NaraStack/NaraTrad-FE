@@ -1,0 +1,85 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="logo">
+      <div class="top">
+        <img src="logo.png" alt="NaraTrad" />
+        <h1>NaraTrad</h1>
+      </div>
+      <p>Stock Portfolio Tracker</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <!-- Full Name -->
+      <label>Full Name</label>
+      <input type="text" formControlName="fullName" placeholder="Enter your full name" />
+      <div
+        *ngIf="registerForm.get('fullName')?.touched && registerForm.get('fullName')?.invalid"
+        class="error"
+      >
+        Full Name is required
+      </div>
+
+      <!-- Email -->
+      <label>Email Address</label>
+      <input type="email" formControlName="email" placeholder="Enter your email" />
+      <div
+        *ngIf="registerForm.get('email')?.touched && registerForm.get('email')?.invalid"
+        class="error"
+      >
+        Enter a valid email
+      </div>
+
+      <!-- Password -->
+      <label>Password</label>
+      <div class="password-group">
+        <input
+          [type]="showPassword ? 'text' : 'password'"
+          formControlName="password"
+          placeholder="Create a password"
+        />
+
+        <span class="eye material-icons" (click)="showPassword = !showPassword">
+          {{ showPassword ? 'visibility_off' : 'visibility' }}
+        </span>
+      </div>
+
+      <div
+        class="error"
+        *ngIf="registerForm.get('password')?.touched && registerForm.get('password')?.invalid"
+      >
+        Password must be at least 6 characters
+      </div>
+
+      <!-- Confirm Password -->
+      <label>Confirm Password</label>
+      <div class="password-group">
+        <input
+          [type]="showConfirmPassword ? 'text' : 'password'"
+          formControlName="confirmPassword"
+          placeholder="Re-enter your password"
+        />
+
+        <span class="eye material-icons" (click)="showConfirmPassword = !showConfirmPassword">
+          {{ showConfirmPassword ? 'visibility_off' : 'visibility' }}
+        </span>
+      </div>
+
+      <div
+        class="error"
+        *ngIf="registerForm.errors?.['mismatch'] && registerForm.get('confirmPassword')?.touched"
+      >
+        Passwords do not match
+      </div>
+
+      <!-- Remember Me -->
+      <div class="remember-me">
+        <input type="checkbox" formControlName="rememberMe" /> Remember me
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="btn-submit">Create Account</button>
+
+      <p class="login-link">Already have an account? <a routerLink="/login">Login</a></p>
+    </form>
+  </div>
+</div>

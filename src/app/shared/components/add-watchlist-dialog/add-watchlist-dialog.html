@@ -1,0 +1,67 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>Add to Watchlist</h2>
+
+  <mat-dialog-content>
+    <!-- Stock Search with Custom Dropdown -->
+    <div class="form-group stock-search-wrapper">
+      <label for="stock">Search Stock</label>
+      <input
+        name="searchStock"
+        [ngModel]="searchQuery"
+        (ngModelChange)="onSearchChange($event)"
+        placeholder="Search stocks (e.g., AAPL, TSLA)..."
+        class="search-input"
+        autocomplete="off"
+        [readonly]="isQuickAdd"
+      />
+      <span *ngIf="loading" class="loading-text">Loading...</span>
+
+      <!-- Custom Dropdown -->
+      <div class="stock-dropdown" *ngIf="stocks.length > 0">
+        <div
+          class="stock-dropdown-item"
+          *ngFor="let stock of stocks"
+          (click)="searchQuery = getStockDisplay(stock); onStockSelected(getStockValue(stock))"
+        >
+          {{ getStockDisplay(stock) }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Selected Stock Display -->
+    <div class="form-group" *ngIf="selectedStock">
+      <label>Selected Stock</label>
+      <input type="text" class="search-input" [value]="selectedStock" disabled />
+      <div class="price-display" *ngIf="selectedStockPrice !== null">
+        <strong>Current Price:</strong> 
+        <span class="price-value">${{ selectedStockPrice | number:'1.2-2' }}</span>
+    </div>
+    </div>
+
+    <!-- Target Price Input -->
+    <div class="form-group">
+      <label for="targetPrice">Target Price (Optional)</label>
+      <input
+        name="targetPrice"
+        type="number"
+        [(ngModel)]="targetPrice"
+        placeholder="Enter target price"
+        class="search-input"
+        step="0.01"
+      />
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" type="button" class="btn-cancel">Cancel</button>
+    <button
+      mat-raised-button
+      (click)="onSubmit()"
+      type="button"
+      class="btn-submit"
+      [disabled]="!selectedStock"
+    >
+      Add to Watchlist
+    </button>
+  </mat-dialog-actions>
+</div>

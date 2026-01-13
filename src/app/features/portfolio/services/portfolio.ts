@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Stock } from '../../../shared/models/stock';
+import { Stock, DashboardData, PerformanceChartDTO } from '../../../shared/models/stock';
 import { HttpParams } from '@angular/common/http';
 
 @Injectable({
@@ -18,13 +18,20 @@ export class PortfolioService {
   }
 
   // GET dashboard lengkap (jika ingin data lebih lengkap)
-  getDashboard(): Observable<Stock[]> {
-    return this.http.get<Stock[]>(`${this.apiUrl}/dashboard`);
+  getDashboard(): Observable<DashboardData> {
+    return this.http.get<DashboardData>(`${this.apiUrl}/dashboard`);
   }
 
   // DELETE stock by id
-  deleteStock(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deleteStock(id: number): Observable<string> {
+    return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
+  }
+
+  updateStock(symbol: string, quantity: number): Observable<{ newQuantity: number }> {
+    const url = `${this.apiUrl}/update-stock/${encodeURIComponent(symbol)}`;
+    return this.http.put<{ newQuantity: number }>(url, {
+      addedQuantity: quantity,
+    });
   }
 
   // POST add atau update stock
@@ -54,5 +61,10 @@ export class PortfolioService {
     return this.http.get<{ totalPortfolioValue: number; totalStocksOwned: number }>(
       `${this.apiUrl}/summary`
     );
+  }
+
+  // GET performance chart data
+  getPerformanceChart(): Observable<PerformanceChartDTO> {
+    return this.http.get<PerformanceChartDTO>(`${this.apiUrl}/performance`);
   }
 }

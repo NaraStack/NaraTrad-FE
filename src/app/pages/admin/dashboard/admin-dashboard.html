@@ -1,0 +1,126 @@
+<div class="dashboard-container">
+  <div class="header">
+    <h1 class="title">Admin Dashboard</h1>
+  </div>
+
+  <mat-tab-group animationDuration="0ms">
+    <!-- tab 1 : user management -->
+    <mat-tab label="User Management">
+      <section>
+        <h1 class="section-title">User Management</h1>
+
+        <div class="user-container">
+          <div class="user-grid">
+            <div class="card">
+              <div class="label">Total Registered Users</div>
+              <div class="value">{{ stats.totalUsers }}</div>
+            </div>
+
+            <div class="card">
+              <div class="label">Active User Today</div>
+              <div class="value">{{ stats.activeToday }}</div>
+            </div>
+
+            <div class="card">
+              <div class="label">New Users This Week</div>
+              <div class="value">{{ stats.newUsersThisWeek }}</div>
+            </div>
+          </div>
+
+          <div class="chart-wrapper">
+            <h2>User Growth</h2>
+            <canvas
+              *ngIf="lineChartData?.datasets?.length"
+              baseChart
+              [data]="lineChartData"
+              [options]="lineChartOptions"
+              [type]="'line'"
+            >
+            </canvas>
+          </div>
+        </div>
+      </section>
+    </mat-tab>
+
+    <!-- tab 2 : portfolio statistics -->
+    <mat-tab label="Portfolio Statistics">
+      <section>
+        <h1 class="section-title">Portfolio Statistics</h1>
+
+        <div class="user-grid">
+          <div class="card">
+            <div class="label">Total Unique Stocks</div>
+            <div class="value">{{ stats.totalUniqueStocks }}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Average portfolio size</div>
+            <div class="value">
+              {{ stats.avgPortfolioSize | number:'1.2-2' }}
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="label">Total market value</div>
+            <div class="value">{{ stats.totalMarketValue }}</div>
+          </div>
+        </div>
+
+        <h1 class="section-title">Popular Stocks</h1>
+
+        <mat-card class="table-card">
+          <table mat-table [dataSource]="popularStocks" class="mat-elevation-z2">
+            <ng-container matColumnDef="no">
+              <th mat-header-cell *matHeaderCellDef>No</th>
+              <td mat-cell *matCellDef="let row; let i = index">
+                {{ i + 1 }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="symbol">
+              <th mat-header-cell *matHeaderCellDef>Stock Symbol</th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.symbol }}
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="count">
+              <th mat-header-cell *matHeaderCellDef>Total Count</th>
+              <td mat-cell *matCellDef="let row">
+                {{ row.count }}
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+            <tr *ngIf="popularStocks.length === 0">
+              <td colspan="3" class="empty">No data available</td>
+            </tr>
+          </table>
+        </mat-card>
+      </section>
+    </mat-tab>
+
+    <!-- tab 3 : ⁠ ⁠System Metrics -->
+    <mat-tab label="System Metrics">
+      <section>
+        <h1 class="section-title">System Metrics</h1>
+
+        <div class="user-grid">
+          <div class="card">
+            <div class="label">Total API Calls Stocks</div>
+            <div class="value">{{ stats.totalApiCalls }}</div>
+          </div>
+
+          <div class="card">
+            <div class="label">Response Times</div>
+            <div class="value">
+              {{ stats.avgResponseTime | number:'1.2-2' }}
+            </div>
+          </div>
+        </div>
+      </section>
+    </mat-tab>
+  </mat-tab-group>
+</div>
