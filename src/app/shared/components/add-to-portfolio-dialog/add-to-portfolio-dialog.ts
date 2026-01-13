@@ -96,14 +96,11 @@ export class AddToPortfolioDialogComponent implements OnInit, OnDestroy {
             symbol: this.symbol,
             quantity: Number(this.quantity),
           });
+          this.isSubmitting = false;
         },
         error: (err) => {
           console.error(err);
-          this.toast.showError(
-            'Failed to add stock',
-            'Please try again later.',
-            4000
-          );
+          this.toast.showError('Failed to add stock', 'Please try again later.', 4000);
           this.isSubmitting = false;
         },
       });

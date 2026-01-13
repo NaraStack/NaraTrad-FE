@@ -1,15 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-import { ConfirmDialog } from './confirm-dialog';
+import { UpdateStockComponent } from './update-stock.component';
 
-describe('ConfirmDialog', () => {
-  let component: ConfirmDialog;
-  let fixture: ComponentFixture<ConfirmDialog>;
+describe('UpdateStockComponent', () => {
+  let component: UpdateStockComponent;
+  let fixture: ComponentFixture<UpdateStockComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ConfirmDialog],
+      imports: [UpdateStockComponent, HttpClientTestingModule],
       providers: [
         {
           provide: MatDialogRef,
@@ -20,14 +21,14 @@ describe('ConfirmDialog', () => {
         {
           provide: MAT_DIALOG_DATA,
           useValue: {
-            title: 'Confirm',
-            message: 'Are you sure?',
+            symbol: 'AAPL',
+            quantity: 10,
           },
         },
       ],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ConfirmDialog);
+    fixture = TestBed.createComponent(UpdateStockComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

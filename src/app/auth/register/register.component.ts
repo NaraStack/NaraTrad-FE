@@ -26,6 +26,7 @@ export class RegisterComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', Validators.required],
+      rememberMe: [false],
     },
     { validators: this.passwordMatchValidator }
   );
