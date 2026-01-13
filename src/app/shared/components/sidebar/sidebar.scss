@@ -9,15 +9,95 @@
   background: linear-gradient(180deg, $blue, $blue-150);
   display: flex;
   flex-direction: column;
-  color: $white;
-  z-index: 100;
+  z-index: 120;
+  transition: transform 0.3s ease;
+
+  @media (max-width: 768px) {
+    transform: translateX(-100%);
+  }
+
+  &.open {
+    transform: translateX(0);
+  }
+}
+
+// Overlay untuk mobile
+.sidebar-overlay {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100dvh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 90;
+  }
+}
+
+// Tambahkan tombol hamburger untuk mobile
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  width: 44px;
+  height: 44px;
+  background-color: $blue;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  z-index: 200;
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  span {
+    position: absolute;
+    width: 22px;
+    height: 2.5px;
+    background-color: white;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+
+  span:nth-child(1) {
+    transform: translateY(-7px);
+  }
+
+  span:nth-child(2) {
+    opacity: 1;
+  }
+
+  span:nth-child(3) {
+    transform: translateY(7px);
+  }
+
+  &.open {
+    span:nth-child(1) {
+      transform: rotate(45deg);
+    }
+
+    span:nth-child(2) {
+      opacity: 0;
+    }
+
+    span:nth-child(3) {
+      transform: rotate(-45deg);
+    }
+  }
 }
 
 .sidebar__header {
   display: flex;
   align-items: center;
   padding: 0 24px 32px;
-  margin-top: 48px;
+  margin-top: 78px;
   margin-bottom: 24px;
 
   .logo-image {

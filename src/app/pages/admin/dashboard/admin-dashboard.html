@@ -56,13 +56,13 @@
           <div class="card">
             <div class="label">Average portfolio size</div>
             <div class="value">
-              {{ stats.avgPortfolioSize | number:'1.2-2' }}
+              {{ stats.avgPortfolioSize | number : '1.2-2' }}
             </div>
           </div>
 
           <div class="card">
             <div class="label">Total market value</div>
-            <div class="value">{{ stats.totalMarketValue }}</div>
+            <div class="value">{{ stats.totalMarketValue | number : '1.2-2' }}</div>
           </div>
         </div>
 
@@ -116,7 +116,7 @@
           <div class="card">
             <div class="label">Response Times</div>
             <div class="value">
-              {{ stats.avgResponseTime | number:'1.2-2' }}
+              {{ stats.avgResponseTime | number : '1.2-2' }}
             </div>
           </div>
         </div>

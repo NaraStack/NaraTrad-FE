@@ -109,3 +109,8 @@ button {
   box-shadow: none !important;
   padding: 0 !important;
 }
+
+::ng-deep button.mat-raised-button.btn-submit {
+  background-color: #2f5d2f;
+  color: #fff;
+}

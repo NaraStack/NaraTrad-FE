@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:8080/api', // Update with production URL
+  apiUrl: 'https://naratrad-be-production.up.railway.app/api', // Update with production URL
 };
