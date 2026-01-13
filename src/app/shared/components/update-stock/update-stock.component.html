@@ -1,0 +1,55 @@
+<div class="update-stock-container">
+  <h2>Update Stock</h2>
+  <form (ngSubmit)="onUpdate()" class="card-form">
+    <!-- Selected Stock (disabled) -->
+    <div class="form-group">
+      <label for="stock">Selected Stock</label>
+      <input
+        type="text"
+        class="search-input"
+        [value]="selectedStock ? getStockDisplay(selectedStock) : ''"
+        disabled
+      />
+    </div>
+
+    <!-- Stock Price (disabled) -->
+    <div class="form-group">
+      <label for="price">Stock Price</label>
+      <input
+        type="text"
+        class="search-input"
+        [value]="stockPrice !== null ? '$' + stockPrice : '$'"
+        disabled
+      />
+    </div>
+
+    <!-- Quantity (editable) -->
+    <div class="form-group">
+      <label for="quantity">Stock Quantity</label>
+      <input
+        name="qty"
+        type="number"
+        [(ngModel)]="quantity"
+        (ngModelChange)="calculateTotalPrice()"
+        class="search-input"
+      />
+    </div>
+
+    <!-- Total Price (disabled) -->
+    <div class="form-group">
+      <label for="total_price">Total Price</label>
+      <input
+        type="text"
+        [value]="totalPrice | currency : 'USD' : 'symbol'"
+        class="search-input"
+        disabled
+      />
+    </div>
+
+    <!-- Dialog Buttons -->
+    <div class="dialog-actions">
+      <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
+      <button type="submit" class="btn-submit">Update Stock</button>
+    </div>
+  </form>
+</div>
