@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { Watchlist } from '../watchlist/watchlist';
-import { WatchlistService } from 'app/features/watchlist/services/watchlist.service';
+import { Watchlist } from 'app/pages/watchlist/watchlist';
+import { WatchlistService } from './watchlist.service';
 import { of } from 'rxjs';
 
 class MockWatchlistService {

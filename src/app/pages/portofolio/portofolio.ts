@@ -18,7 +18,7 @@ import { ToastComponent } from 'app/shared/components/toast/toast.component';
 import { ToastService } from 'app/core/services/toast.service';
 
 import { AddStock } from '../add-stock/add-stock';
-
+import { UpdateStockComponent } from 'app/shared/components/update-stock/update-stock.component';
 @Component({
   selector: 'app-portofolio',
   standalone: true,
@@ -41,7 +41,7 @@ import { AddStock } from '../add-stock/add-stock';
 export class Portofolio implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['symbol', 'price', 'change', 'quantity', 'action'];
   dataSource = new MatTableDataSource<Stock>();
-
+  stocks: Stock[] = [];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
@@ -107,7 +107,7 @@ export class Portofolio implements OnInit, AfterViewInit {
     });
   }
 
-  // === OPEN DIALOG ADD STOCK ===
+  // OPEN DIALOG ADD STOCK
   openAddDialog(): void {
     const dialogRef = this.dialog.open(AddStock, {
       width: '500px',
@@ -144,6 +144,29 @@ export class Portofolio implements OnInit, AfterViewInit {
           `Stock ${result.symbol} berhasil ditambahkan ke portfolio`,
           2000
         );
+      }
+    });
+  }
+  // OPEN DIALOG UPDATE STOCK
+
+  openUpdateDialog(stock: Stock): void {
+    const dialogRef = this.dialog.open(UpdateStockComponent, {
+      width: '500px',
+      data: { stock },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (!result) return;
+
+      const index = this.dataSource.data.findIndex((s) => s.symbol === result.symbol);
+
+      if (index !== -1) {
+        this.dataSource.data[index] = {
+          ...this.dataSource.data[index],
+          quantity: result.quantity,
+        };
+
+        this.dataSource.data = [...this.dataSource.data];
       }
     });
   }
