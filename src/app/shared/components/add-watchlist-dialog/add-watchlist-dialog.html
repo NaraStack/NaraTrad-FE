@@ -1,5 +1,5 @@
 <div class="dialog-container">
-  <h2 mat-dialog-title>Add to Watchlist</h2>
+  <h2>Add to Watchlist</h2>
 
   <mat-dialog-content>
     <!-- Stock Search with Custom Dropdown -->
@@ -33,9 +33,9 @@
       <label>Selected Stock</label>
       <input type="text" class="search-input" [value]="selectedStock" disabled />
       <div class="price-display" *ngIf="selectedStockPrice !== null">
-        <strong>Current Price:</strong> 
-        <span class="price-value">${{ selectedStockPrice | number:'1.2-2' }}</span>
-    </div>
+        <strong>Current Price:</strong>
+        <span class="price-value">${{ selectedStockPrice | number : '1.2-2' }}</span>
+      </div>
     </div>
 
     <!-- Target Price Input -->
