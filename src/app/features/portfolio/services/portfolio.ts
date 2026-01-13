@@ -27,6 +27,13 @@ export class PortfolioService {
     return this.http.delete(`${this.apiUrl}/${id}`, { responseType: 'text' });
   }
 
+  updateStock(symbol: string, quantity: number): Observable<{ newQuantity: number }> {
+    const url = `${this.apiUrl}/update-stock/${encodeURIComponent(symbol)}`;
+    return this.http.put<{ newQuantity: number }>(url, {
+      addedQuantity: quantity,
+    });
+  }
+
   // POST add atau update stock
   addOrUpdateStock(stock: { symbol: string; quantity: number }): Observable<any> {
     return this.http.post(`${this.apiUrl}`, stock);
