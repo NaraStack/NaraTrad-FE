@@ -1,4 +1,14 @@
-<aside class="sidebar">
+<!-- Hamburger (mobile only) -->
+<button class="hamburger" [class.open]="isSidebarOpen" (click)="toggleSidebar()">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<!-- Overlay (mobile) -->
+<div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="toggleSidebar()"></div>
+
+<aside class="sidebar" [class.open]="isSidebarOpen">
   <!-- Logo -->
   <div class="sidebar__header">
     <img src="/logo.png" alt="NaraTrad Logo" class="logo-image" />
@@ -9,45 +19,56 @@
   <nav class="sidebar__menu">
     <!-- Admin Menu -->
     @if (isAdmin) {
-    <a routerLink="/admin/dashboard" routerLinkActive="active" class="menu-item">
-      <img src="/icon-dashboard.png" alt="Dashboard" class="icon" />
+    <a
+      routerLink="/admin/dashboard"
+      routerLinkActive="active"
+      class="menu-item"
+      (click)="closeSidebar()"
+    >
+      <img src="/icon-dashboard.png" class="icon" />
       <span class="label">Dashboard</span>
     </a>
 
-    <a routerLink="/admin/settings" routerLinkActive="active" class="menu-item">
-      <img src="/icon-settings.png" alt="Settings" class="icon" />
+    <a
+      routerLink="/admin/settings"
+      routerLinkActive="active"
+      class="menu-item"
+      (click)="closeSidebar()"
+    >
+      <img src="/icon-settings.png" class="icon" />
       <span class="label">Settings</span>
     </a>
 
-    <a (click)="onLogout()" class="menu-logout-admin">
-      <img src="/icon-logout.png" alt="Logout" class="icon" />
+    <a (click)="onLogout(); closeSidebar()" class="menu-logout-admin">
+      <img src="/icon-logout.png" class="icon" />
       <span class="label">Logout</span>
     </a>
     }
 
     <!-- User Menu -->
     @if (!isAdmin) {
-    <a routerLink="/dashboard" routerLinkActive="active" class="menu-item">
-      <img src="/icon-dashboard.png" alt="Dashboard" class="icon" />
+    <a routerLink="/dashboard" routerLinkActive="active" class="menu-item" (click)="closeSidebar()">
+      <img src="/icon-dashboard.png" class="icon" />
       <span class="label">Dashboard</span>
     </a>
 
-    <a routerLink="/portfolio" routerLinkActive="active" class="menu-item">
-      <img src="/icon-portfolio.png" alt="Dashboard" class="icon" />
+    <a routerLink="/portfolio" routerLinkActive="active" class="menu-item" (click)="closeSidebar()">
+      <img src="/icon-portfolio.png" class="icon" />
       <span class="label">Portfolio</span>
     </a>
 
-    <a routerLink="/watchlist" routerLinkActive="active" class="menu-item">
-      <img src="/icon-watchlist.png" alt="Dashboard" class="icon" />
+    <a routerLink="/watchlist" routerLinkActive="active" class="menu-item" (click)="closeSidebar()">
+      <img src="/icon-watchlist.png" class="icon" />
       <span class="label">Watchlist</span>
     </a>
 
-    <a routerLink="/settings" routerLinkActive="active" class="menu-item">
-      <img src="/icon-settings.png" alt="Dashboard" class="icon" />
+    <a routerLink="/settings" routerLinkActive="active" class="menu-item" (click)="closeSidebar()">
+      <img src="/icon-settings.png" class="icon" />
       <span class="label">Settings</span>
     </a>
-    <a (click)="onLogout()" class="menu-logout">
-      <img src="/icon-logout.png" alt="Logout" class="icon" />
+
+    <a (click)="onLogout(); closeSidebar()" class="menu-logout">
+      <img src="/icon-logout.png" class="icon" />
       <span class="label">Logout</span>
     </a>
     }

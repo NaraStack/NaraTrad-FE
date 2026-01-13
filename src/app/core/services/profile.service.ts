@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { environment } from 'environments/environment.prod';
 import { UserResponse } from '../models/auth.model';
 import { AuthService } from './auth.service';
 
@@ -22,10 +22,7 @@ export interface ChangePasswordRequest {
 export class ProfileService {
   private apiUrl = `${environment.apiUrl}/profile`;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {}
+  constructor(private http: HttpClient, private authService: AuthService) {}
 
   /**
    * Get profile of currently logged in user
@@ -106,8 +103,13 @@ export class ProfileService {
     }
 
     // Priority 3: Handle validation errors (object with multiple fields)
-    if (error.error && typeof error.error === 'object' && !error.error.error && !error.error.message) {
-      const errorMessages = Object.values(error.error).filter(val => typeof val === 'string');
+    if (
+      error.error &&
+      typeof error.error === 'object' &&
+      !error.error.error &&
+      !error.error.message
+    ) {
+      const errorMessages = Object.values(error.error).filter((val) => typeof val === 'string');
       if (errorMessages.length > 0) {
         return errorMessages.join(', ');
       }

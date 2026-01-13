@@ -1,16 +1,11 @@
 <div class="dialog-container">
-  <h2 mat-dialog-title>Add to Portfolio</h2>
+  <h2>Add to Portfolio</h2>
 
   <mat-dialog-content>
     <!-- Symbol Display (Read-only) -->
     <div class="form-group">
       <label for="symbol">Stock Symbol</label>
-      <input
-        type="text"
-        class="search-input"
-        [value]="symbol"
-        disabled
-      />
+      <input type="text" class="search-input" [value]="symbol" disabled />
     </div>
 
     <!-- Stock Price Display -->
@@ -46,7 +41,7 @@
       <label for="total_price">Total Price</label>
       <input
         type="text"
-        [value]="totalPrice ? ('$' + totalPrice) : '$0.00'"
+        [value]="totalPrice ? '$' + totalPrice : '$0.00'"
         class="search-input"
         disabled
       />
@@ -54,7 +49,15 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()" type="button" class="btn-cancel" [disabled]="isSubmitting">Cancel</button>
+    <button
+      mat-button
+      (click)="onCancel()"
+      type="button"
+      class="btn-cancel"
+      [disabled]="isSubmitting"
+    >
+      Cancel
+    </button>
     <button
       mat-raised-button
       (click)="onSubmit()"

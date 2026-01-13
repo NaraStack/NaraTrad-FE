@@ -202,6 +202,97 @@ td.mat-cell {
 
 .add-btn {
   position: relative;
-  z-index: 9999;
+  z-index: 1;
   pointer-events: auto;
+}
+
+@media (max-width: 768px) {
+  .portfolio-container {
+    margin-left: 0;
+    padding: 16px;
+  }
+
+  /* Header */
+  .header {
+    flex-direction: column;
+    gap: 12px;
+
+    .title {
+      font-size: 24px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .add-btn {
+      width: 50%;
+      align-self: flex-end;
+    }
+  }
+
+  /* Toolbar (Export CSV) */
+  .toolbar {
+    button.export-csv {
+      width: 50%;
+      font-size: 14px;
+      padding: 10px;
+    }
+  }
+
+  /* Search */
+  .search-wrapper {
+    gap: 12px;
+
+    .search-icon {
+      width: 24px;
+      height: 24px;
+    }
+
+    .search-input {
+      width: 100%;
+      font-size: 14px;
+    }
+  }
+
+  /* Table Wrapper */
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 12px;
+  }
+
+  table {
+    min-width: 720px; // aman untuk semua kolom
+  }
+
+  /* Table font & padding */
+  th.mat-header-cell,
+  td.mat-cell {
+    font-size: 14px;
+    padding: 12px;
+  }
+
+  .mat-mdc-header-cell,
+  .mat-mdc-cell {
+    font-size: 14px;
+  }
+
+  /* Action */
+  .action-cell {
+    gap: 6px;
+
+    mat-icon {
+      font-size: 22px;
+    }
+
+    .action-icon {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  /* Paginator */
+  ::ng-deep .mat-mdc-paginator,
+  ::ng-deep .mat-mdc-paginator-range-label {
+    font-size: 14px;
+  }
 }

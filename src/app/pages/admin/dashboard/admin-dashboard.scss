@@ -36,8 +36,8 @@ mat-tab-body {
   font-weight: 700;
   color: $blue;
 
-  margin-bottom: 12px;
-  margin-top: 12px;
+  margin-bottom: 22px;
+  margin-top: 22px;
 }
 
 // user management
@@ -140,4 +140,101 @@ table {
   padding: 32px;
   font-size: 18px;
   color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    margin-left: 0; // sidebar off
+    padding: 16px;
+    min-height: auto;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 16px;
+
+    .title {
+      font-size: 24px;
+      text-align: center;
+    }
+  }
+
+  .section-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  /* Cards */
+  .card {
+    max-width: 100%;
+    padding: 20px;
+    margin-bottom: 24px;
+
+    .label {
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .value {
+      font-size: 28px;
+      text-align: center;
+    }
+  }
+
+  /* User Grid */
+  .user-grid {
+    grid-template-columns: 1fr; // 1 kolom
+    gap: 16px;
+    justify-items: stretch;
+  }
+
+  /* Chart */
+  .chart-wrapper {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .unique {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  /* Table */
+  .table-card {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table {
+    min-width: 600px; // biar kolom aman
+  }
+
+  .mat-mdc-header-cell {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .mat-mdc-row {
+    height: auto;
+  }
+
+  .mat-mdc-cell {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  .empty {
+    font-size: 14px;
+    padding: 24px;
+  }
+
+  /* Tabs */
+  mat-tab-group {
+    margin-top: 8px;
+  }
+
+  mat-tab-body {
+    padding-top: 8px;
+  }
 }
