@@ -61,12 +61,15 @@ export class LoginComponent implements OnDestroy {
           // ambil returnUrl kalau ada
           const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
 
-          // redirect berdasarkan role
-          if (response.user.role === Role.ADMIN) {
-            this.router.navigateByUrl(returnUrl || '/admin/dashboard');
-          } else {
-            this.router.navigateByUrl(returnUrl || '/dashboard');
-          }
+          // Add small delay to ensure token and user are properly set
+          setTimeout(() => {
+            // redirect berdasarkan role
+            if (response.user.role === Role.ADMIN) {
+              this.router.navigateByUrl(returnUrl || '/admin/dashboard');
+            } else {
+              this.router.navigateByUrl(returnUrl || '/dashboard');
+            }
+          }, 100);
         },
 
         error: (err: any) => {

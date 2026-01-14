@@ -53,11 +53,7 @@
   <!-- Chart Section -->
   <div class="chart-section">
     <h2 class="section-title">Stock Performance Chart</h2>
-    <div *ngIf="chartLoading" class="chart-loading">
-      <div class="spinner"></div>
-      <p>Loading chart data...</p>
-    </div>
-    <div class="chart-container" *ngIf="!chartLoading">
+    <div class="chart-container">
       <canvas #performanceChart></canvas>
     </div>
   </div>
