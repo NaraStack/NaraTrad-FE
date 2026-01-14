@@ -1,13 +1,17 @@
 <div class="portfolio-container">
+  <app-loading-spinner [isLoading]="isLoading" message="Loading portfolio..."></app-loading-spinner>
+
   <!-- Header -->
-  <div class="header">
+  <div class="header" *ngIf="!isLoading">
     <h1 class="title">Portfolio</h1>
     <!-- <a mat-raised-button class="add-btn" routerLink="/add-stock">+ Add Stock</a> -->
     <a mat-raised-button class="add-btn" (click)="openAddDialog()">+ Add Stock</a>
   </div>
 
-  <!-- Search -->
-  <div class="search-wrapper">
+  <!-- Content (hidden while loading) -->
+  <div *ngIf="!isLoading">
+    <!-- Search -->
+    <div class="search-wrapper">
     <img src="/icon-search.png" alt="Search" class="search-icon" />
     <input
       matInput
@@ -71,6 +75,7 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
+    </div>
+    <mat-paginator [pageSize]="5" [pageSizeOptions]="[5]" showFirstLastButtons> </mat-paginator>
   </div>
-  <mat-paginator [pageSize]="5" [pageSizeOptions]="[5]" showFirstLastButtons> </mat-paginator>
 </div>

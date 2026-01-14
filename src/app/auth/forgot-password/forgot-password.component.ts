@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-forgot-password',
@@ -10,7 +14,7 @@ import { Router, RouterModule } from '@angular/router';
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss'],
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnDestroy {
   loading = false;
   error: string | null = null;
 
@@ -18,7 +22,14 @@ export class ForgotPasswordComponent {
     email: ['', [Validators.required, Validators.email]],
   });
 
-  constructor(private fb: FormBuilder, private router: Router) {}
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private authService: AuthService,
+    private toast: ToastService
+  ) {}
 
   onSubmit(): void {
     if (this.forgotPasswordForm.invalid || this.loading) {
@@ -30,11 +41,31 @@ export class ForgotPasswordComponent {
 
     const { email } = this.forgotPasswordForm.getRawValue();
 
-    // setTimeout(() => {
-    //   console.log('Reset password link sent to:', email);
+    this.authService.forgotPassword(email)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          this.toast.showSuccess(
+            'Password reset link sent!',
+            'Please check your email for further instructions.',
+            3000
+          );
+          this.router.navigate(['/login']);
+        },
+        error: (err: any) => {
+          this.loading = false;
+          this.toast.showError(
+            'Failed to send reset link',
+            'Please try again or contact support.',
+            4000
+          );
+        },
+      });
+  }
 
-    //   this.loading = false;
-    //   this.router.navigate(['/login']);
-    // }, 1500);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }
