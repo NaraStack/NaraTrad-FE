@@ -1,5 +1,7 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
@@ -16,6 +18,7 @@ import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-di
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ToastComponent } from 'app/shared/components/toast/toast.component';
 import { ToastService } from 'app/core/services/toast.service';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner';
 
 import { AddStock } from '../add-stock/add-stock';
 import { UpdateStockComponent } from 'app/shared/components/update-stock/update-stock.component';
@@ -34,14 +37,17 @@ import { UpdateStockComponent } from 'app/shared/components/update-stock/update-
     RouterModule,
     ToastComponent,
     MatSnackBarModule,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './portofolio.html',
   styleUrls: ['./portofolio.scss'],
 })
-export class Portofolio implements OnInit, AfterViewInit {
+export class Portofolio implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns: string[] = ['symbol', 'price', 'change', 'quantity', 'action'];
   dataSource = new MatTableDataSource<Stock>();
   stocks: Stock[] = [];
+  isLoading = true;
+  private destroy$ = new Subject<void>();
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
@@ -69,10 +75,19 @@ export class Portofolio implements OnInit, AfterViewInit {
   }
 
   private loadStocks(): void {
-    this.portfolioService.getStocks().subscribe({
-      next: (data) => (this.dataSource.data = data),
-      error: () => alert('Failed to load stocks'),
-    });
+    this.isLoading = true;
+    this.portfolioService.getStocks()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.dataSource.data = data;
+          this.isLoading = false;
+        },
+        error: () => {
+          alert('Failed to load stocks');
+          this.isLoading = false;
+        },
+      });
   }
 
   confirmDelete(stock: Stock): void {
@@ -200,5 +215,10 @@ export class Portofolio implements OnInit, AfterViewInit {
     a.download = 'portfolio.csv';
     a.click();
     window.URL.revokeObjectURL(url);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

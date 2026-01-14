@@ -5,6 +5,7 @@ import {
   ViewChild,
   ChangeDetectorRef,
   ElementRef,
+  OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -17,13 +18,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '../../core/services/auth.service';
-
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { Router } from '@angular/router';
 
 import { Stock, DashboardData } from '../../shared/models/stock';
 import { PortfolioService } from '../../features/portfolio/services/portfolio';
 import { ConfirmDialog } from '../../shared/components/confirm-dialog/confirm-dialog';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner';
 import { Chart, registerables } from 'chart.js';
 
 Chart.register(...registerables);
@@ -40,12 +43,13 @@ Chart.register(...registerables);
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    MatSelectModule, 
+    MatSelectModule,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard implements OnInit, AfterViewInit {
+export class Dashboard implements OnInit, AfterViewInit, OnDestroy {
   // Dashboard Summary Data
   totalPortfolioValue = 0;
   totalStocksOwned = 0;
@@ -59,6 +63,11 @@ export class Dashboard implements OnInit, AfterViewInit {
   topGainers: Stock[] = [];
   topLosers: Stock[] = [];
   largestHoldings: Stock[] = [];
+
+  // Loading states
+  isLoading = true;
+  chartLoading = false;
+  private destroy$ = new Subject<void>();
 
   // Chart
   @ViewChild('performanceChart') performanceChartRef!: ElementRef<HTMLCanvasElement>;
@@ -88,28 +97,34 @@ export class Dashboard implements OnInit, AfterViewInit {
   /* ===================== DATA ===================== */
 
   private loadDashboard(): void {
-    this.portfolioService.getDashboard().subscribe({
-      next: (data: DashboardData) => {
-        // Set summary data
-        this.totalPortfolioValue = data.totalPortfolioValue || 0;
-        this.totalStocksOwned = data.totalStocksOwned || 0;
-        this.totalInvestment = data.totalInvestment || 0;
-        this.totalGainLoss = data.totalGainLoss || 0;
-        this.roi = data.roi || 0;
-        this.dailyChange = data.dailyChange || 0;
-        this.dailyChangePercent = data.dailyChangePercent || 0;
+    this.isLoading = true;
+    this.portfolioService.getDashboard()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: DashboardData) => {
+          // Set summary data
+          this.totalPortfolioValue = data.totalPortfolioValue || 0;
+          this.totalStocksOwned = data.totalStocksOwned || 0;
+          this.totalInvestment = data.totalInvestment || 0;
+          this.totalGainLoss = data.totalGainLoss || 0;
+          this.roi = data.roi || 0;
+          this.dailyChange = data.dailyChange || 0;
+          this.dailyChangePercent = data.dailyChangePercent || 0;
 
-        // Process stock lists
-        this.processStockLists(data.stockList || []);
+          // Process stock lists
+          this.processStockLists(data.stockList || []);
 
-        // Initialize chart
-        this.cd.detectChanges();
-        this.loadPerformanceChart();
-      },
-      error: (err) => {
-        console.error('Failed to load dashboard data', err);
-      },
-    });
+          // Initialize chart
+          this.cd.detectChanges();
+          this.loadPerformanceChart();
+
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Failed to load dashboard data', err);
+          this.isLoading = false;
+        },
+      });
   }
 
   private processStockLists(stocks: Stock[]): void {
@@ -132,14 +147,19 @@ export class Dashboard implements OnInit, AfterViewInit {
   }
 
   private loadPerformanceChart(): void {
-    this.portfolioService.getPerformanceChart().subscribe({
-      next: (data) => {
-        this.initializeChart(data.labels, data.values);
-      },
-      error: (err) => {
-        console.error('Failed to load chart data', err);
-      }
-    });
+    this.chartLoading = true;
+    this.portfolioService.getPerformanceChart()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.initializeChart(data.labels, data.values);
+          this.chartLoading = false;
+        },
+        error: (err) => {
+          console.error('Failed to load chart data', err);
+          this.chartLoading = false;
+        }
+      });
   }
 
   private initializeChart(labels: string[], dataPoints: number[]): void {
@@ -238,5 +258,10 @@ export class Dashboard implements OnInit, AfterViewInit {
 
   goToAddStock(): void {
     this.router.navigate(['/add-stock']);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

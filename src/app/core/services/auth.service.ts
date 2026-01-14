@@ -84,6 +84,28 @@ export class AuthService {
   }
 
   /**
+   * Request password reset link via email
+   */
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot-password`, { email }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        return throwError(() => this.handleError(error));
+      })
+    );
+  }
+
+  /**
+   * Reset password with token
+   */
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-password`, { token, newPassword }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        return throwError(() => this.handleError(error));
+      })
+    );
+  }
+
+  /**
    * Logout user
    */
   logout(): void {

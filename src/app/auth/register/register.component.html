@@ -77,7 +77,12 @@
       </div>
 
       <!-- Submit -->
-      <button type="submit" class="btn-submit">Create Account</button>
+      <button type="submit" class="btn-submit" [disabled]="loading">
+        <span *ngIf="!loading">Create Account</span>
+        <span *ngIf="loading" class="loading-spinner">
+          <span class="spinner"></span> Creating...
+        </span>
+      </button>
 
       <p class="login-link">Already have an account? <a routerLink="/login">Login</a></p>
     </form>
