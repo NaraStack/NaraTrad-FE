@@ -9,8 +9,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   background-color: #0a1a64;
+  padding: 1rem;
+
+  @media (max-width: 600px) {
+    padding: 1.5rem 1rem;
+  }
+
+  @media (max-width: 480px) {
+    padding: 2rem 1rem;
+  }
 }
 
 .register-card {

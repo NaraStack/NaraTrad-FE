@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, MatPaginatorIntl } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -54,8 +54,23 @@ export class Portofolio implements OnInit, AfterViewInit, OnDestroy {
     private portfolioService: PortfolioService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private toast: ToastService
-  ) {}
+    private toast: ToastService,
+    private paginatorIntl: MatPaginatorIntl
+  ) {
+    this.customizePaginator();
+  }
+
+  private customizePaginator(): void {
+    this.paginatorIntl.itemsPerPageLabel = 'Items per page:';
+    this.paginatorIntl.getRangeLabel = (page: number, pageSize: number, length: number) => {
+      if (length === 0 || pageSize === 0) {
+        return `0 of ${length}`;
+      }
+      const startIndex = page * pageSize;
+      const endIndex = startIndex < length ? Math.min(startIndex + pageSize, length) : startIndex + pageSize;
+      return `${startIndex + 1} - ${endIndex} of ${length}`;
+    };
+  }
 
   ngOnInit(): void {
     this.dataSource.filterPredicate = (data: Stock, filter: string) =>
