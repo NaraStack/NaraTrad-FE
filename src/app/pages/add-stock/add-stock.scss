@@ -47,6 +47,21 @@
     color: #666;
     font-style: italic;
   }
+
+  .price-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .price-loading {
+    position: absolute;
+    right: 12px;
+    font-size: 0.85rem;
+    color: #3b82f6;
+    font-weight: 600;
+    font-style: normal;
+  }
 }
 .btn-submit {
   width: 100%;

@@ -32,9 +32,12 @@
     <div class="form-group" *ngIf="selectedStock">
       <label>Selected Stock</label>
       <input type="text" class="search-input" [value]="selectedStock" disabled />
-      <div class="price-display" *ngIf="selectedStockPrice !== null">
+      <div class="price-display" *ngIf="!priceLoading && selectedStockPrice !== null">
         <strong>Current Price:</strong>
         <span class="price-value">${{ selectedStockPrice | number : '1.2-2' }}</span>
+      </div>
+      <div class="price-loading" *ngIf="priceLoading">
+        <strong>Loading price...</strong>
       </div>
     </div>
 
@@ -53,15 +56,15 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()" type="button" class="btn-cancel">Cancel</button>
+    <button mat-button (click)="onCancel()" type="button" class="btn-cancel" [disabled]="submitLoading">Cancel</button>
     <button
       mat-raised-button
       (click)="onSubmit()"
       type="button"
       class="btn-submit"
-      [disabled]="!selectedStock"
+      [disabled]="!selectedStock || submitLoading || priceLoading"
     >
-      Add to Watchlist
+      {{ submitLoading ? 'Adding...' : 'Add to Watchlist' }}
     </button>
   </mat-dialog-actions>
 </div>

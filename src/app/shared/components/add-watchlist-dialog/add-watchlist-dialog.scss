@@ -91,6 +91,25 @@
       margin-left: 4px;
     }
   }
+
+  .price-loading {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background-color: #e3f2fd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #1976d2;
+  }
+
+  .loading-text {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.85rem;
+    color: #3b82f6;
+    font-weight: 600;
+  }
 }
 
 mat-dialog-actions {

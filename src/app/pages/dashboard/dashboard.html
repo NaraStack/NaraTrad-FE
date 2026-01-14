@@ -57,7 +57,9 @@
       <div class="spinner"></div>
       <p>Loading chart data...</p>
     </div>
-    <canvas *ngIf="!chartLoading" #performanceChart height="80"></canvas>
+    <div class="chart-container" *ngIf="!chartLoading">
+      <canvas #performanceChart></canvas>
+    </div>
   </div>
 
   <!-- Stock Lists Grid -->

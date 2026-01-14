@@ -30,13 +30,16 @@
     <!-- Stock Price -->
     <div class="form-group">
       <label for="price">Stock Price</label>
-      <input
-        placeholder="$"
-        type="text"
-        class="search-input"
-        [value]="stockPrice !== null ? '$' + stockPrice : '$'"
-        disabled
-      />
+      <div class="price-input-wrapper">
+        <input
+          placeholder="$"
+          type="text"
+          class="search-input"
+          [value]="stockPrice !== null ? '$' + stockPrice : (priceLoading ? 'Loading...' : '$')"
+          disabled
+        />
+        <span *ngIf="priceLoading" class="price-loading">Loading...</span>
+      </div>
     </div>
 
     <!-- Quantity -->
@@ -65,8 +68,10 @@
 
     <!-- Dialog Buttons -->
     <div class="dialog-actions">
-      <button type="button" class="btn-cancel" (click)="onCancel()">Cancel</button>
-      <button type="submit" class="btn-submit">Add Stock</button>
+      <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="loading">Cancel</button>
+      <button type="submit" class="btn-submit" [disabled]="loading || !selectedStock || !quantity">
+        {{ loading ? 'Adding...' : 'Add Stock' }}
+      </button>
     </div>
   </form>
 </div>

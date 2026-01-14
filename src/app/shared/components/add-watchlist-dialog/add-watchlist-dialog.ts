@@ -40,6 +40,8 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
   selectedStock: string | null = null;
   targetPrice: number | null = null;
   loading: boolean = false;
+  priceLoading: boolean = false;
+  submitLoading: boolean = false;
   portfolioSymbols: Set<string>;
   watchlistSymbols: Set<string>;
   isQuickAdd: boolean = false; // For pre-filled symbol scenario
@@ -112,10 +114,14 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (!this.selectedStock) return;
 
-    this.dialogRef.close({
-      symbol: this.selectedStock,
-      targetPrice: this.targetPrice,
-    });
+    this.submitLoading = true;
+    // Simulate async operation completion delay, then close
+    setTimeout(() => {
+      this.dialogRef.close({
+        symbol: this.selectedStock,
+        targetPrice: this.targetPrice,
+      });
+    }, 300);
   }
 
   /**
@@ -138,9 +144,13 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
   onStockSelected(symbol: string): void {
     this.selectedStock = symbol;
     this.stocks = []; // Close dropdown
-    
+
     // fetch price
-    this.stockService.stockPrice(symbol).subscribe({
+    this.priceLoading = true;
+    this.stockService.stockPrice(symbol).pipe(
+      takeUntil(this.destroy$),
+      finalize(() => (this.priceLoading = false))
+    ).subscribe({
         next: (price) => {
         this.selectedStockPrice = price;
         },
@@ -148,5 +158,5 @@ export class AddWatchlistDialogComponent implements OnInit, OnDestroy {
         this.selectedStockPrice = null;
         }
     });
-    }
+  }
 }

@@ -122,9 +122,13 @@ export class AddStock implements OnInit, OnDestroy {
   onSubmit(): void {
     if (!this.selectedStock || !this.quantity) return;
 
+    this.loading = true;
     this.stockService
       .createStock(this.selectedStock, Number(this.quantity))
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.loading = false))
+      )
       .subscribe({
         next: () => {
           this.toast.showSuccess(
