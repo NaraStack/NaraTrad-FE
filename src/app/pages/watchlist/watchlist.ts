@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
@@ -10,7 +10,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LoadingSpinnerComponent } from '../../shared/components/loading-spinner/loading-spinner';
 
 import { Watchlist as WatchlistModel } from '../../shared/models/stock';
 import { WatchlistService } from '../../features/watchlist/services/watchlist.service';
@@ -35,14 +37,17 @@ import { ToastService } from 'app/core/services/toast.service';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
+    LoadingSpinnerComponent,
   ],
   templateUrl: './watchlist.html',
   styleUrl: './watchlist.scss',
 })
-export class Watchlist implements OnInit, AfterViewInit {
+export class Watchlist implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns: string[] = ['symbol', 'price', 'change', 'action'];
   dataSource = new MatTableDataSource<WatchlistModel>();
   portfolioSymbols: Set<string> = new Set();
+  isLoading = true;
+  private destroy$ = new Subject<void>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -67,20 +72,25 @@ export class Watchlist implements OnInit, AfterViewInit {
   }
 
   loadData(): void {
+    this.isLoading = true;
     forkJoin({
       watchlist: this.watchlistService.getAllWatchlist(),
       portfolio: this.portfolioService.getStocks(),
-    }).subscribe({
-      next: ({ watchlist, portfolio }) => {
-        // Store portfolio symbols for validation
-        this.portfolioSymbols = new Set(portfolio.map((s) => s.symbol));
-        this.dataSource.data = watchlist;
-      },
-      error: () => {
-        // TOAST ERROR
-        this.toast.showError('Error', 'Failed to load data', 4000);
-      },
-    });
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: ({ watchlist, portfolio }) => {
+          // Store portfolio symbols for validation
+          this.portfolioSymbols = new Set(portfolio.map((s) => s.symbol));
+          this.dataSource.data = watchlist;
+          this.isLoading = false;
+        },
+        error: () => {
+          // TOAST ERROR
+          this.toast.showError('Error', 'Failed to load data', 4000);
+          this.isLoading = false;
+        },
+      });
   }
 
   loadWatchlist(): void {
@@ -211,6 +221,11 @@ export class Watchlist implements OnInit, AfterViewInit {
         this.toast.showError('Error', 'Failed to remove from watchlist', 4000);
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // private showToast(type: 'success' | 'error', title: string, message: string): void {

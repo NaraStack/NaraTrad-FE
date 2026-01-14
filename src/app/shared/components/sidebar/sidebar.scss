@@ -118,6 +118,7 @@
 .sidebar__menu {
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .menu-item {
@@ -171,6 +172,10 @@
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
 
+  @media (max-width: 768px) {
+    margin-top: auto;
+  }
+
   .label {
     font-size: 16px;
     font-weight: 400;
@@ -212,6 +217,10 @@
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.2s ease, color 0.2s ease;
+
+  @media (max-width: 768px) {
+    margin-top: auto;
+  }
 
   .label {
     font-size: 16px;

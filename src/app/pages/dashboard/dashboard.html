@@ -53,7 +53,11 @@
   <!-- Chart Section -->
   <div class="chart-section">
     <h2 class="section-title">Stock Performance Chart</h2>
-    <canvas #performanceChart height="80"></canvas>
+    <div *ngIf="chartLoading" class="chart-loading">
+      <div class="spinner"></div>
+      <p>Loading chart data...</p>
+    </div>
+    <canvas *ngIf="!chartLoading" #performanceChart height="80"></canvas>
   </div>
 
   <!-- Stock Lists Grid -->

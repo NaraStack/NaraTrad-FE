@@ -1,12 +1,14 @@
 <div class="watchlist-container">
+  <app-loading-spinner [isLoading]="isLoading" message="Loading watchlist..."></app-loading-spinner>
+
   <!-- Header -->
-  <div class="header">
+  <div class="header" *ngIf="!isLoading">
     <h1 class="title">Watchlist</h1>
     <button mat-raised-button class="add-btn" (click)="openAddDialog()">+ Add to Watchlist</button>
   </div>
 
   <!-- Search -->
-  <div class="search-wrapper">
+  <div class="search-wrapper" *ngIf="!isLoading">
     <img src="/icon-search.png" alt="Search" class="search-icon" />
     <input
       matInput
@@ -18,7 +20,7 @@
   </div>
 
   <!-- Table -->
-  <div class="table-wrapper">
+  <div class="table-wrapper" *ngIf="!isLoading">
     <table mat-table [dataSource]="dataSource" matSort>
       <!-- Symbol -->
       <ng-container matColumnDef="symbol">
@@ -61,5 +63,5 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
   </div>
-  <mat-paginator [pageSize]="5" [pageSizeOptions]="[5]" showFirstLastButtons> </mat-paginator>
+  <mat-paginator *ngIf="!isLoading" [pageSize]="5" [pageSizeOptions]="[5]" showFirstLastButtons> </mat-paginator>
 </div>

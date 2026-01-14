@@ -36,7 +36,7 @@
 }
 
 button.export-csv {
-  background-color: $blue-100;
+  background-color: $blue;
   color: white;
   font-weight: 600;
   padding: 0.5rem 1rem;
@@ -45,12 +45,12 @@ button.export-csv {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 
   &:hover {
-    background-color: $blue;
+    background-color: #0d47a1;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   }
 
   &:active {
-    background-color: $blue-150;
+    background-color: #0a3d91;
     transform: translateY(1px);
   }
 
