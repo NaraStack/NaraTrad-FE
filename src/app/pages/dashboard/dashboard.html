@@ -1,6 +1,8 @@
 <div class="dashboard-container">
+  <app-loading-spinner [isLoading]="isLoading" message="Loading dashboard data..."></app-loading-spinner>
+
   <!-- Header -->
-  <div class="header">
+  <div class="header" *ngIf="!isLoading">
     <h1 class="page-title">Dashboard</h1>
     <div class="user-greeting">
       <span>Welcome back,</span>
@@ -8,8 +10,10 @@
     </div>
   </div>
 
-  <!-- Portfolio Value Card -->
-  <div class="portfolio-value-card">
+  <!-- Content (hidden while loading) -->
+  <div *ngIf="!isLoading">
+    <!-- Portfolio Value Card -->
+    <div class="portfolio-value-card">
     <div class="portfolio-value-title">Total Portfolio Value</div>
     <div class="portfolio-value-amount">{{ totalPortfolioValue | currency:'USD':'symbol':'1.2-2' }}</div>
     <div class="daily-change" [ngClass]="dailyChange >= 0 ? 'positive' : 'negative'">
@@ -49,7 +53,11 @@
   <!-- Chart Section -->
   <div class="chart-section">
     <h2 class="section-title">Stock Performance Chart</h2>
-    <canvas #performanceChart height="80"></canvas>
+    <div *ngIf="chartLoading" class="chart-loading">
+      <div class="spinner"></div>
+      <p>Loading chart data...</p>
+    </div>
+    <canvas *ngIf="!chartLoading" #performanceChart height="80"></canvas>
   </div>
 
   <!-- Stock Lists Grid -->
@@ -125,5 +133,6 @@
         </div>
       </ng-template>
     </div>
+  </div>
   </div>
 </div>

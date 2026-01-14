@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { NgChartsModule } from 'ng2-charts';
@@ -7,15 +7,21 @@ import { AdminDashboardService } from 'app/core/services/admin-dashboard.service
 import { AdminDashboardResponse, PopularStock } from 'app/core/models/admin-dashboard'; // ➕ ADDED
 import { MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
+import { LoadingSpinnerComponent } from 'app/shared/components/loading-spinner/loading-spinner';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, MatCardModule, NgChartsModule, MatTableModule, MatTabsModule],
+  imports: [CommonModule, MatCardModule, NgChartsModule, MatTableModule, MatTabsModule, LoadingSpinnerComponent],
   templateUrl: './admin-dashboard.html',
   styleUrls: ['./admin-dashboard.scss'],
 })
-export class AdminDashboard implements OnInit {
+export class AdminDashboard implements OnInit, OnDestroy {
+  isLoading = true;
+  private destroy$ = new Subject<void>();
+
   constructor(private dashboardService: AdminDashboardService) {}
 
   stats = {
@@ -68,52 +74,62 @@ export class AdminDashboard implements OnInit {
   }
 
   loadDashboard(): void {
-    this.dashboardService.getDashboard().subscribe({
-      next: (res: AdminDashboardResponse) => {
-        const {
-          totalUsers,
-          activeUsersToday,
-          newUsersThisWeek,
-          userGrowthData,
-          totalUniqueStocks,
-          popularStocks,
-          avgPortfolioSize,
-          totalMarketValue,
-          totalApiCalls,
-          avgResponseTime,
-        } = res;
+    this.isLoading = true;
+    this.dashboardService.getDashboard()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: AdminDashboardResponse) => {
+          const {
+            totalUsers,
+            activeUsersToday,
+            newUsersThisWeek,
+            userGrowthData,
+            totalUniqueStocks,
+            popularStocks,
+            avgPortfolioSize,
+            totalMarketValue,
+            totalApiCalls,
+            avgResponseTime,
+          } = res;
 
-        // stats user
-        this.stats = {
-          totalUsers,
-          activeToday: activeUsersToday,
-          newUsersThisWeek,
-          totalUniqueStocks,
-          avgPortfolioSize,
-          totalMarketValue,
-          totalApiCalls,
-          avgResponseTime,
-        };
+          // stats user
+          this.stats = {
+            totalUsers,
+            activeToday: activeUsersToday,
+            newUsersThisWeek,
+            totalUniqueStocks,
+            avgPortfolioSize,
+            totalMarketValue,
+            totalApiCalls,
+            avgResponseTime,
+          };
 
-        // user growth
-        this.lineChartData = {
-          labels: userGrowthData.map((item) => item.date),
-          datasets: [
-            {
-              label: 'User Growth',
-              data: userGrowthData.map((item) => item.count),
-              tension: 0.4,
-              borderWidth: 2,
-            },
-          ],
-        };
+          // user growth
+          this.lineChartData = {
+            labels: userGrowthData.map((item) => item.date),
+            datasets: [
+              {
+                label: 'User Growth',
+                data: userGrowthData.map((item) => item.count),
+                tension: 0.4,
+                borderWidth: 2,
+              },
+            ],
+          };
 
-        // poppular stocks
-        this.popularStocks = popularStocks;
-      },
-      error: (err) => {
-        console.error('Failed to load dashboard data', err);
-      },
-    });
+          // poppular stocks
+          this.popularStocks = popularStocks;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Failed to load dashboard data', err);
+          this.isLoading = false;
+        },
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

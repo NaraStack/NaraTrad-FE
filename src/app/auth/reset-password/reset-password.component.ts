@@ -1,7 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-reset-password',
@@ -10,14 +14,23 @@ import { RouterModule } from '@angular/router';
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss'],
 })
-export class ResetPasswordComponent {
+export class ResetPasswordComponent implements OnInit, OnDestroy {
   resetPasswordForm: FormGroup;
   showPassword = false;
   loading = false;
   showConfirmPassword = false;
   submitted = false;
+  token: string | null = null;
 
-  constructor(private fb: FormBuilder) {
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private toast: ToastService
+  ) {
     this.resetPasswordForm = this.fb.group(
       {
         newPassword: ['', [Validators.required, Validators.minLength(6)]],
@@ -27,6 +40,19 @@ export class ResetPasswordComponent {
         validators: this.passwordMatchValidator,
       }
     );
+  }
+
+  ngOnInit() {
+    // Get token from query parameter
+    this.token = this.route.snapshot.queryParamMap.get('token');
+    if (!this.token) {
+      this.toast.showError(
+        'Invalid or missing token',
+        'Please use the reset link from your email.',
+        4000
+      );
+      this.router.navigate(['/login']);
+    }
   }
 
   passwordMatchValidator(form: FormGroup) {
@@ -39,7 +65,7 @@ export class ResetPasswordComponent {
   onSubmit() {
     this.submitted = true;
 
-    if (this.resetPasswordForm.invalid) {
+    if (this.resetPasswordForm.invalid || !this.token) {
       this.resetPasswordForm.markAllAsTouched();
       return;
     }
@@ -47,18 +73,37 @@ export class ResetPasswordComponent {
     this.loading = true;
 
     const { newPassword } = this.resetPasswordForm.value;
-    console.log('New Password:', newPassword);
 
-    setTimeout(() => {
-      this.loading = false;
-      alert('Password berhasil direset');
-      this.resetPasswordForm.reset();
-      this.submitted = false;
-    }, 1500);
+    this.authService.resetPassword(this.token, newPassword)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          this.toast.showSuccess(
+            'Password reset successful!',
+            'Redirecting to login...',
+            3000
+          );
+          this.router.navigate(['/login']);
+        },
+        error: (err: any) => {
+          this.loading = false;
+          this.toast.showError(
+            'Failed to reset password',
+            'Please try again or request a new reset link.',
+            4000
+          );
+        },
+      });
   }
 
   isBothFilled(): boolean {
     const { newPassword, confirmPassword } = this.resetPasswordForm.value;
     return !!newPassword && !!confirmPassword;
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

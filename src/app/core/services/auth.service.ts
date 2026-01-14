@@ -1,7 +1,7 @@
 import { Injectable, signal, PLATFORM_ID, Inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, throwError, of } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import {
@@ -78,6 +78,36 @@ export class AuthService {
         this.setUser(currentUser);
       }),
       catchError((error: HttpErrorResponse) => {
+        return throwError(() => this.handleError(error));
+      })
+    );
+  }
+
+  /**
+   * Request password reset link via email
+   */
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/forgot-password`, { email }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // If status is 200, it's a success response - return the response body
+        if (error.status === 200 && error.error) {
+          return of(error.error);
+        }
+        return throwError(() => this.handleError(error));
+      })
+    );
+  }
+
+  /**
+   * Reset password with token
+   */
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/reset-password`, { token, newPassword }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // If status is 200, it's a success response - return the response body
+        if (error.status === 200 && error.error) {
+          return of(error.error);
+        }
         return throwError(() => this.handleError(error));
       })
     );

@@ -51,7 +51,12 @@
       </div>
 
       <!-- Submit -->
-      <button type="submit" class="btn-submit">Login</button>
+      <button type="submit" class="btn-submit" [disabled]="loading">
+        <span *ngIf="!loading">Login</span>
+        <span *ngIf="loading" class="loading-spinner">
+          <span class="spinner"></span> Logging in...
+        </span>
+      </button>
 
       <p class="error" *ngIf="error">{{ error }}</p>
     </form>
